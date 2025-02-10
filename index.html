@@ -1,8 +1,123 @@
-<p>Hello 大家好</p>
-<p>我是霸都丶傲天，这是我的个人网站。 </p>
-<p>很高兴你来到这里, 你可以在以下的网站找到我</p>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金融知识导航</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #333;
+            overflow: hidden;
+        }
+        nav a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .container {
+            padding: 20px;
+        }
+        .category {
+            margin-bottom: 20px;
+        }
+        .category h2 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .category ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .category li {
+            background-color: #e9e9e9;
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .category a {
+            color: #333;
+            text-decoration: none;
+        }
+        .category a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
 
-<ul>
-  <li> <a href="https://www.zhihu.com/people/AJLoveChina">知乎</a> </li>
-  <li> <a href="http://hejie.nigeerhuo.com">我的博客(已经不更细了,现在在知乎写文章)</a> </li>
-</ul>
+<header>
+    <h1>金融知识导航</h1>
+</header>
+
+<nav>
+    <a href="#banking">银行知识</a>
+    <a href="#investment">投资知识</a>
+    <a href="#cryptocurrency">加密货币</a>
+    <a href="#insurance">保险知识</a>
+</nav>
+
+<div class="container">
+    <div id="banking" class="category">
+        <h2>银行知识</h2>
+        <ul>
+            <li><a href="#">银行账户类型</a></li>
+            <li><a href="#">信用卡使用技巧</a></li>
+            <li><a href="#">贷款知识</a></li>
+            <li><a href="#">银行存款利率</a></li>
+        </ul>
+    </div>
+
+    <div id="investment" class="category">
+        <h2>投资知识</h2>
+        <ul>
+            <li><a href="#">股票市场基础</a></li>
+            <li><a href="#">基金投资</a></li>
+            <li><a href="#">房地产投资</a></li>
+            <li><a href="#">风险投资</a></li>
+        </ul>
+    </div>
+
+    <div id="cryptocurrency" class="category">
+        <h2>加密货币</h2>
+        <ul>
+            <li><a href="#">比特币介绍</a></li>
+            <li><a href="#">以太坊概述</a></li>
+            <li><a href="#">加密货币交易平台</a></li>
+            <li><a href="#">区块链技术</a></li>
+        </ul>
+    </div>
+
+    <div id="insurance" class="category">
+        <h2>保险知识</h2>
+        <ul>
+            <li><a href="#">健康保险基础</a></li>
+            <li><a href="#">人寿保险</a></li>
+            <li><a href="#">财产保险</a></li>
+            <li><a href="#">车险选择指南</a></li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
