@@ -19,7 +19,7 @@
         }
         
         header {
-            background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+            background: linear-gradient(135deg, #144a87 0%, #071420 51%, #163e5e 100%);
             color: white;
             padding: 2rem 0;
             text-align: center;
@@ -79,8 +79,13 @@
             border-radius: 8px;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            display: none;
         }
-        
+
+        .category.active {
+            display: block; /* 添加active类时显示该类别 */
+        }
+
         .category-header {
             background-color: #2989d8;
             color: white;
@@ -172,6 +177,34 @@
             }
         }
     </style>
+
+<script>
+     document.addEventListener('DOMContentLoaded', function() {
+        // 获取所有的卡片元素
+        const cards = document.querySelectorAll('.site-card');
+
+        // 遍历每个卡片，添加跳转链接
+        cards.forEach(card => {
+            const urlElement = card.querySelector('.site-url');
+            if (urlElement) {
+                const url = urlElement.textContent || urlElement.innerText; // 获取url
+                const aTag = document.createElement('a');  // 创建一个 <a> 标签
+                aTag.href = url;  // 设置链接地址
+                aTag.target = '_blank';  // 设置新窗口打开
+                aTag.style.display = 'block';  // 让 <a> 标签包裹整个卡片
+                aTag.style.textDecoration = 'none';  // 去掉链接的下划线
+                aTag.style.color = 'inherit';  // 保持原有颜色
+
+                // 把原始卡片内容移到 <a> 标签里
+                aTag.innerHTML = card.innerHTML;
+
+                // 清空原卡片内容并把 <a> 标签加回
+                card.innerHTML = '';
+                card.appendChild(aTag);
+            }
+        });
+    });
+</script>
 </head>
 <body>
     <header>
@@ -195,560 +228,590 @@
             <div class="nav-item" data-category="tools">工具服务</div>
         </div>
     </nav>
-    
-    <div class="container">
+
+    <div class="container content">
         <div class="search-container">
             <input type="text" id="search" placeholder="搜索金融资源...">
         </div>
-        
-        <div class="content">
-            <!-- 基础科普类 -->
-            <div class="category" id="basic">
-                <div class="category-header">基础科普类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">Investopedia</div>
-                        <div class="site-url">https://www.investopedia.com</div>
-                        <div class="site-note">全球知名金融知识平台</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">Khan Academy - 金融与资本市场</div>
-                        <div class="site-url">https://www.khanacademy.org/economics-finance-domain</div>
-                        <div class="site-note">免费金融课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">新浪财经 - 理财学院</div>
-                        <div class="site-url">https://finance.sina.com.cn</div>
-                        <div class="site-note">主站地址，理财学院为子板块</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">网易云课堂 - 金融基础</div>
-                        <div class="site-url">https://study.163.com/category/finance</div>
-                        <div class="site-note">需注册</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">简七理财</div>
-                        <div class="site-url">https://www.jian7.com</div>
-                        <div class="site-note">个人理财科普平台</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">雪球 - 新手入门</div>
-                        <div class="site-url">https://xueqiu.com</div>
-                        <div class="site-note">社区内有新手专区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">百度金融百科</div>
-                        <div class="site-url">https://baike.baidu.com</div>
-                        <div class="site-note">搜索"金融"相关词条</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">腾讯理财通 - 知识库</div>
-                        <div class="site-url">https://licai.qq.com</div>
-                        <div class="site-note">理财知识库</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">蚂蚁财富 - 小白学堂</div>
-                        <div class="site-url">https://www.antfortune.com</div>
-                        <div class="site-note">需登录支付宝查看</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">知乎金融话题专栏</div>
-                        <div class="site-url">https://www.zhihu.com/topic/19559424/hot</div>
-                        <div class="site-note">用户讨论与科普内容</div>
-                    </div>
-                </div>
+
+        <!-- 基础科普类 -->
+        <div class="category" id="basic">
+          <div class="category-header">基础科普类</div>
+          <div class="sites-container">
+            <div class="site-card">
+              <div class="site-name">Investopedia</div>
+              <div class="site-url">https://www.investopedia.com</div>
+              <div class="site-note">全球知名金融知识平台</div>
             </div>
-            
-            <!-- 专业深度类 -->
-            <div class="category" id="professional" style="display:none;">
-                <div class="category-header">专业深度类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">Bloomberg</div>
-                        <div class="site-url">https://www.bloomberg.com</div>
-                        <div class="site-note">国际金融资讯与分析</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">Morningstar</div>
-                        <div class="site-url">https://www.morningstar.com</div>
-                        <div class="site-note">基金与投资分析工具</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">CFA Institute</div>
-                        <div class="site-url">https://www.cfainstitute.org</div>
-                        <div class="site-note">CFA考试与行业研究</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">SSRN（社会科学研究网）</div>
-                        <div class="site-url">https://www.ssrn.com</div>
-                        <div class="site-note">学术论文与研究报告</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">华尔街见闻 - 深度研究</div>
-                        <div class="site-url">https://wallstreetcn.com</div>
-                        <div class="site-note">需订阅部分内容</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">中国金融四十人论坛</div>
-                        <div class="site-url">http://www.cf40.org.cn</div>
-                        <div class="site-note">政策与行业研究</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">财新网 - 宏观分析</div>
-                        <div class="site-url">https://economy.caixin.com</div>
-                        <div class="site-note">付费阅读为主</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">中金公司研究报告</div>
-                        <div class="site-url">https://research.cicc.com</div>
-                        <div class="site-note">需注册下载报告</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">国泰君安证券研究所</div>
-                        <div class="site-url">https://www.gtjas.com/research</div>
-                        <div class="site-note">券商研究报告</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">万得资讯（Wind）</div>
-                        <div class="site-url">https://www.wind.com.cn</div>
-                        <div class="site-note">金融数据终端（需订阅）</div>
-                    </div>
-                </div>
+            <div class="site-card">
+              <div class="site-name">Khan Academy - 金融与资本市场</div>
+              <div class="site-url">https://www.khanacademy.org/economics-finance-domain</div>
+              <div class="site-note">免费金融课程</div>
             </div>
-            
-            <!-- 大众普及类 -->
-            <div class="category" id="popular" style="display:none;">
-                <div class="category-header">大众普及类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">支付宝理财频道</div>
-                        <div class="site-url">https://ur.alipay.com</div>
-                        <div class="site-note">支付宝App内入口</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">招商银行 - 财富管理</div>
-                        <div class="site-url">https://wealth.cmbchina.com</div>
-                        <div class="site-note">理财知识普及</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">东方财富网 - 理财知识</div>
-                        <div class="site-url">https://www.eastmoney.com</div>
-                        <div class="site-note">主站地址，理财知识为子板块</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">天天基金网 - 投资者教育</div>
-                        <div class="site-url">https://fund.eastmoney.com</div>
-                        <div class="site-note">基金投资教育</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">好买基金网</div>
-                        <div class="site-url">https://www.howbuy.com</div>
-                        <div class="site-note">基金投资平台</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">陆金所 - 金融知识库</div>
-                        <div class="site-url">https://www.lu.com</div>
-                        <div class="site-note">需登录查看</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">平安证券 - 投教基地</div>
-                        <div class="site-url">https://stock.pingan.com</div>
-                        <div class="site-note">投资者教育专栏</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">华夏基金 - 投资学堂</div>
-                        <div class="site-url">https://www.chinaamc.com</div>
-                        <div class="site-note">基金知识科普</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">百度财富</div>
-                        <div class="site-url">https://caifu.baidu.com</div>
-                        <div class="site-note">理财知识聚合平台</div>
-                    </div>
-                </div>
+            <div class="site-card">
+              <div class="site-name">新浪财经 - 理财学院</div>
+              <div class="site-url">https://finance.sina.com.cn</div>
+              <div class="site-note">主站地址，理财学院为子板块</div>
             </div>
-            
-            <!-- 学生教育类 -->
-            <div class="category" id="student" style="display:none;">
-                <div class="category-header">学生教育类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">Coursera - 金融课程</div>
-                        <div class="site-url">https://www.coursera.org/browse/business/finance</div>
-                        <div class="site-note">耶鲁大学《金融市场》等课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">edX - MIT《金融学导论》</div>
-                        <div class="site-url">https://www.edx.org/course/introduction-to-finance</div>
-                        <div class="site-note">免费课程（可选证书）</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">中国大学MOOC - 金融学课程</div>
-                        <div class="site-url">https://www.icourse163.org</div>
-                        <div class="site-note">搜索"金融"课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">学堂在线 - 清华五道口金融课程</div>
-                        <div class="site-url">https://www.xuetangx.com</div>
-                        <div class="site-note">清华大学金融课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">高顿财经 - ACCA/CFA课程</div>
-                        <div class="site-url">https://www.gaodun.com</div>
-                        <div class="site-note">职业资格培训</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">新东方在线 - 金融考研辅导</div>
-                        <div class="site-url">https://www.koolearn.com</div>
-                        <div class="site-note">考研金融专业课辅导</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">金融界教育频道</div>
-                        <div class="site-url">http://edu.jrj.com.cn</div>
-                        <div class="site-note">投资与金融教育</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">人大经济论坛（经管之家）</div>
-                        <div class="site-url">https://bbs.pinggu.org</div>
-                        <div class="site-note">学术与职业交流社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">华尔街学堂</div>
-                        <div class="site-url">https://www.wallstreet.cn</div>
-                        <div class="site-note">金融实务课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">启牛学堂</div>
-                        <div class="site-url">https://www.qiniuxueyuan.com</div>
-                        <div class="site-note">理财与投资教育平台</div>
-                    </div>
-                </div>
+            <div class="site-card">
+              <div class="site-name">网易云课堂 - 金融基础</div>
+              <div class="site-url">https://study.163.com/category/finance</div>
+              <div class="site-note">需注册</div>
             </div>
-            
-            <!-- 从业者提升类 -->
-            <div class="category" id="practitioner" style="display:none;">
-                <div class="category-header">从业者提升类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">中国证券业协会官网</div>
-                        <div class="site-url">https://www.sac.net.cn</div>
-                        <div class="site-note">行业培训与政策解读</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">中国银行业协会 - 职业培训</div>
-                        <div class="site-url">http://www.china-cba.net</div>
-                        <div class="site-note">银行业培训资源</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">彭博终端（Bloomberg Terminal）</div>
-                        <div class="site-url">https://www.bloomberg.com/professional</div>
-                        <div class="site-note">需订阅专业终端</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">路透社金融培训</div>
-                        <div class="site-url">https://www.refinitiv.com</div>
-                        <div class="site-note">金融数据与培训服务</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">金融风险管理师（FRM）官网</div>
-                        <div class="site-url">https://www.garp.org</div>
-                        <div class="site-note">FRM认证与资源</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">特许金融分析师（CFA）官网</div>
-                        <div class="site-url">https://www.cfainstitute.org</div>
-                        <div class="site-note">CFA考试与职业发展</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">德勤金融研究院</div>
-                        <div class="site-url">https://www2.deloitte.com/cn/zh.html</div>
-                        <div class="site-note">行业研究报告</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">普华永道 - 行业洞察</div>
-                        <div class="site-url">https://www.pwccn.com</div>
-                        <div class="site-note">金融行业分析</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">麦肯锡金融行业报告</div>
-                        <div class="site-url">https://www.mckinsey.com/industries/financial-services</div>
-                        <div class="site-note">需注册下载报告</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">波士顿咨询（BCG）金融研究</div>
-                        <div class="site-url">https://www.bcg.com/industries/financial-institutions</div>
-                        <div class="site-note">行业洞察与白皮书</div>
-                    </div>
-                </div>
+            <div class="site-card">
+              <div class="site-name">简七理财</div>
+              <div class="site-url">https://www.jian7.com</div>
+              <div class="site-note">个人理财科普平台</div>
             </div>
-            
+            <div class="site-card">
+              <div class="site-name">雪球 - 新手入门</div>
+              <div class="site-url">https://xueqiu.com</div>
+              <div class="site-note">社区内有新手专区</div>
+            </div>
+            <div class="site-card">
+              <div class="site-name">百度金融百科</div>
+              <div class="site-url">https://baike.baidu.com</div>
+              <div class="site-note">搜索"金融"相关词条</div>
+            </div>
+            <div class="site-card">
+              <div class="site-name">腾讯理财通 - 知识库</div>
+              <div class="site-url">https://licai.qq.com</div>
+              <div class="site-note">理财知识库</div>
+            </div>
+            <div class="site-card">
+              <div class="site-name">蚂蚁财富 - 小白学堂</div>
+              <div class="site-url">https://www.antfortune.com</div>
+              <div class="site-note">需登录支付宝查看</div>
+            </div>
+            <div class="site-card">
+              <div class="site-name">知乎金融话题专栏</div>
+              <div class="site-url">https://www.zhihu.com/topic/19559424/hot</div>
+              <div class="site-note">用户讨论与科普内容</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 专业深度类 -->
+        <div class="category" id="professional">
+            <div class="category-header">专业深度类</div>
+            <div class="sites-container">
+              <div class="site-card">
+                <div class="site-name">Bloomberg</div>
+                <div class="site-url">https://www.bloomberg.com</div>
+                <div class="site-note">国际金融资讯与分析</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">Morningstar</div>
+                <div class="site-url">https://www.morningstar.com</div>
+                <div class="site-note">基金与投资分析工具</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">CFA Institute</div>
+                <div class="site-url">https://www.cfainstitute.org</div>
+                <div class="site-note">CFA考试与行业研究</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">SSRN（社会科学研究网）</div>
+                <div class="site-url">https://www.ssrn.com</div>
+                <div class="site-note">学术论文与研究报告</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">华尔街见闻 - 深度研究</div>
+                <div class="site-url">https://wallstreetcn.com</div>
+                <div class="site-note">需订阅部分内容</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">中国金融四十人论坛</div>
+                <div class="site-url">http://www.cf40.org.cn</div>
+                <div class="site-note">政策与行业研究</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">财新网 - 宏观分析</div>
+                <div class="site-url">https://economy.caixin.com</div>
+                <div class="site-note">付费阅读为主</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">中金公司研究报告</div>
+                <div class="site-url">https://research.cicc.com</div>
+                <div class="site-note">需注册下载报告</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">国泰君安证券研究所</div>
+                <div class="site-url">https://www.gtjas.com/research</div>
+                <div class="site-note">券商研究报告</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">万得资讯（Wind）</div>
+                <div class="site-url">https://www.wind.com.cn</div>
+                <div class="site-note">金融数据终端（需订阅）</div>
+              </div>
+            </div>
+        </div>
+
+        <!-- 大众普及类 -->
+        <div class="category" id="popular">
+            <div class="category-header">大众普及类</div>
+            <div class="sites-container">
+              <div class="site-card">
+                <div class="site-name">支付宝理财频道</div>
+                <div class="site-url">https://ur.alipay.com</div>
+                <div class="site-note">支付宝App内入口</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">招商银行 - 财富管理</div>
+                <div class="site-url">https://wealth.cmbchina.com</div>
+                <div class="site-note">理财知识普及</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">东方财富网 - 理财知识</div>
+                <div class="site-url">https://www.eastmoney.com</div>
+                <div class="site-note">主站地址，理财知识为子板块</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">天天基金网 - 投资者教育</div>
+                <div class="site-url">https://fund.eastmoney.com</div>
+                <div class="site-note">基金投资教育</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">好买基金网</div>
+                <div class="site-url">https://www.howbuy.com</div>
+                <div class="site-note">基金投资平台</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">陆金所 - 金融知识库</div>
+                <div class="site-url">https://www.lu.com</div>
+                <div class="site-note">需登录查看</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">平安证券 - 投教基地</div>
+                <div class="site-url">https://stock.pingan.com</div>
+                <div class="site-note">投资者教育专栏</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">华夏基金 - 投资学堂</div>
+                <div class="site-url">https://www.chinaamc.com</div>
+                <div class="site-note">基金知识科普</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">百度财富</div>
+                <div class="site-url">https://caifu.baidu.com</div>
+                <div class="site-note">理财知识聚合平台</div>
+              </div>
+            </div>
+        </div>
+
+        <!-- 学生教育类 -->
+        <div class="category" id="student">
+            <div class="category-header">学生教育类</div>
+            <div class="sites-container">
+              <div class="site-card">
+                <div class="site-name">Coursera - 金融课程</div>
+                <div class="site-url">https://www.coursera.org/browse/business/finance</div>
+                <div class="site-note">耶鲁大学《金融市场》等课程</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">edX - MIT《金融学导论》</div>
+                <div class="site-url">https://www.edx.org/course/introduction-to-finance</div>
+                <div class="site-note">免费课程（可选证书）</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">中国大学MOOC - 金融学课程</div>
+                <div class="site-url">https://www.icourse163.org</div>
+                <div class="site-note">搜索"金融"课程</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">学堂在线 - 清华五道口金融课程</div>
+                <div class="site-url">https://www.xuetangx.com</div>
+                <div class="site-note">清华大学金融课程</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">高顿财经 - ACCA/CFA课程</div>
+                <div class="site-url">https://www.gaodun.com</div>
+                <div class="site-note">职业资格培训</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">新东方在线 - 金融考研辅导</div>
+                <div class="site-url">https://www.koolearn.com</div>
+                <div class="site-note">考研金融专业课辅导</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">金融界教育频道</div>
+                <div class="site-url">http://edu.jrj.com.cn</div>
+                <div class="site-note">投资与金融教育</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">人大经济论坛（经管之家）</div>
+                <div class="site-url">https://bbs.pinggu.org</div>
+                <div class="site-note">学术与职业交流社区</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">华尔街学堂</div>
+                <div class="site-url">https://www.wallstreet.cn</div>
+                <div class="site-note">金融实务课程</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">启牛学堂</div>
+                <div class="site-url">https://www.qiniuxueyuan.com</div>
+                <div class="site-note">理财与投资教育平台</div>
+              </div>
+            </div>
+        </div>
+
+        <!-- 从业者提升类 -->
+        <div class="category" id="practitioner">
+            <div class="category-header">从业者提升类</div>
+            <div class="sites-container">
+              <div class="site-card">
+                <div class="site-name">中国证券业协会官网</div>
+                <div class="site-url">https://www.sac.net.cn</div>
+                <div class="site-note">行业培训与政策解读</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">中国银行业协会 - 职业培训</div>
+                <div class="site-url">http://www.china-cba.net</div>
+                <div class="site-note">银行业培训资源</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">彭博终端（Bloomberg Terminal）</div>
+                <div class="site-url">https://www.bloomberg.com/professional</div>
+                <div class="site-note">需订阅专业终端</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">路透社金融培训</div>
+                <div class="site-url">https://www.refinitiv.com</div>
+                <div class="site-note">金融数据与培训服务</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">金融风险管理师（FRM）官网</div>
+                <div class="site-url">https://www.garp.org</div>
+                <div class="site-note">FRM认证与资源</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">特许金融分析师（CFA）官网</div>
+                <div class="site-url">https://www.cfainstitute.org</div>
+                <div class="site-note">CFA考试与职业发展</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">德勤金融研究院</div>
+                <div class="site-url">https://www2.deloitte.com/cn/zh.html</div>
+                <div class="site-note">行业研究报告</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">普华永道 - 行业洞察</div>
+                <div class="site-url">https://www.pwccn.com</div>
+                <div class="site-note">金融行业分析</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">麦肯锡金融行业报告</div>
+                <div class="site-url">https://www.mckinsey.com/industries/financial-services</div>
+                <div class="site-note">需注册下载报告</div>
+              </div>
+              <div class="site-card">
+                <div class="site-name">波士顿咨询（BCG）金融研究</div>
+                <div class="site-url">https://www.bcg.com/industries/financial-institutions</div>
+                <div class="site-note">行业洞察与白皮书</div>
+              </div>   
+                    
+              </div>
+            </div>
+                
             <!-- 资讯文章类 -->
-            <div class="category" id="news" style="display:none;">
-                <div class="category-header">资讯文章类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">华尔街日报中文网</div>
-                        <div class="site-url">https://cn.wsj.com</div>
-                        <div class="site-note">国际财经新闻</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">财经网</div>
-                        <div class="site-url">https://www.caijing.com.cn</div>
-                        <div class="site-note">国内财经资讯</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">第一财经</div>
-                        <div class="site-url">https://www.yicai.com</div>
-                        <div class="site-note">财经新闻与深度分析</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">界面新闻 - 金融板块</div>
-                        <div class="site-url">https://www.jiemian.com</div>
-                        <div class="site-note">主站地址，金融为子板块</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">经济观察网</div>
-                        <div class="site-url">http://www.eeo.com.cn</div>
-                        <div class="site-note">宏观经济与产业分析</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">福布斯中国</div>
-                        <div class="site-url">https://www.forbeschina.com</div>
-                        <div class="site-note">商业与财富报道</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">21世纪经济报道</div>
-                        <div class="site-url">http://www.21jingji.com</div>
-                        <div class="site-note">财经新闻与政策解读</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">和讯网</div>
-                        <div class="site-url">https://www.hexun.com</div>
-                        <div class="site-note">综合财经资讯</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">金融时报（FT中文网）</div>
-                        <div class="site-url">https://www.ftchinese.com</div>
-                        <div class="site-note">国际财经新闻中文版</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">财联社</div>
-                        <div class="site-url">https://www.cls.cn</div>
-                        <div class="site-note">实时财经快讯</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 视频课程类 -->
-            <div class="category" id="video" style="display:none;">
-                <div class="category-header">视频课程类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">B站财经UP主（如"巫师财经"）</div>
-                        <div class="site-url">https://space.bilibili.com/319318239</div>
-                        <div class="site-note">B站UP主频道</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">YouTube - 金融教育频道</div>
-                        <div class="site-url">https://www.youtube.com</div>
-                        <div class="site-note">搜索"The Plain Bagel"等频道</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">腾讯视频 - 金融公开课</div>
-                        <div class="site-url">https://v.qq.com</div>
-                        <div class="site-note">搜索"金融"相关课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">爱奇艺知识 - 金融专栏</div>
-                        <div class="site-url">https://www.iqiyi.com/知识</div>
-                        <div class="site-note">需订阅部分内容</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">优酷财经频道</div>
-                        <div class="site-url">https://www.youku.com</div>
-                        <div class="site-note">搜索"财经"栏目</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">中国证券网 - 视频讲堂</div>
-                        <div class="site-url">http://www.cnstock.com</div>
-                        <div class="site-note">主站地址，视频为子板块</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">网易公开课 - 金融专题</div>
-                        <div class="site-url">https://open.163.com</div>
-                        <div class="site-note">搜索"金融"课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">喜马拉雅 - 金融音频课</div>
-                        <div class="site-url">https://www.ximalaya.com</div>
-                        <div class="site-note">搜索"金融"相关内容</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 互动社区类 -->
-            <div class="category" id="community" style="display:none;">
-                <div class="category-header">互动社区类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">雪球社区</div>
-                        <div class="site-url">https://xueqiu.com</div>
-                        <div class="site-note">投资交流社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">集思录</div>
-                        <div class="site-url">https://www.jisilu.cn</div>
-                        <div class="site-note">低风险投资社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">同花顺论坛</div>
-                        <div class="site-url">https://www.10jqka.com.cn</div>
-                        <div class="site-note">主站地址，论坛为子板块</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">东方财富股吧</div>
-                        <div class="site-url">https://guba.eastmoney.com</div>
-                        <div class="site-note">股票讨论社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">知乎金融话题讨论区</div>
-                        <div class="site-url">https://www.zhihu.com/topic/19559424</div>
-                        <div class="site-note">用户问答与讨论</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">Reddit - r/investing</div>
-                        <div class="site-url">https://www.reddit.com/r/investing</div>
-                        <div class="site-note">英文投资社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">老虎证券社区</div>
-                        <div class="site-url">https://www.laohu8.com</div>
-                        <div class="site-note">美股投资社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">富途牛牛圈</div>
-                        <div class="site-url">https://www.futunn.com</div>
-                        <div class="site-note">港股与美股社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">英为财情（Investing.com）论坛</div>
-                        <div class="site-url">https://www.investing.com</div>
-                        <div class="site-note">国际金融社区</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">巴克莱银行投资者社区</div>
-                        <div class="site-url">https://www.barclays.co.uk</div>
-                        <div class="site-note">需登录查看</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 知识学习类 -->
-            <div class="category" id="learning" style="display:none;">
-                <div class="category-header">知识学习类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">中国金融培训中心</div>
-                        <div class="site-url">http://www.chinacft.org</div>
-                        <div class="site-note">金融行业培训</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">金融界学院</div>
-                        <div class="site-url">http://edu.jrj.com.cn</div>
-                        <div class="site-note">投资教育平台</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">好未来（学而思）金融课程</div>
-                        <div class="site-url">https://www.100tal.com</div>
-                        <div class="site-note">搜索"金融"课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">网易有道精品课 - 金融模块</div>
-                        <div class="site-url">https://ke.youdao.com</div>
-                        <div class="site-note">搜索"金融"课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">沪江网校 - 金融英语</div>
-                        <div class="site-url">https://www.hujiang.com</div>
-                        <div class="site-note">语言与金融结合课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">高顿教育 - CPA/CFA培训</div>
-                        <div class="site-url">https://www.gaodun.com</div>
-                        <div class="site-note">职业资格培训</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">腾讯课堂 - 金融实战课</div>
-                        <div class="site-url">https://ke.qq.com</div>
-                        <div class="site-note">搜索"金融"课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">得到APP - 香帅的金融学课</div>
-                        <div class="site-url">https://www.dedao.cn</div>
-                        <div class="site-note">需下载APP</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">极客时间 - 金融科技专栏</div>
-                        <div class="site-url">https://time.geekbang.org</div>
-                        <div class="site-note">科技与金融结合课程</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">小鹅通知识店铺（金融类）</div>
-                        <div class="site-url">https://www.xiaoe-tech.com</div>
-                        <div class="site-note">第三方知识店铺平台</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 工具服务类 -->
-            <div class="category" id="tools" style="display:none;">
-                <div class="category-header">工具服务类</div>
-                <div class="sites-container">
-                    <div class="site-card">
-                        <div class="site-name">同花顺iFinD</div>
-                        <div class="site-url">https://www.10jqka.com.cn</div>
-                        <div class="site-note">需订阅终端</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">东方财富Choice数据</div>
-                        <div class="site-url">https://choice.eastmoney.com</div>
-                        <div class="site-note">金融数据终端</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">大智慧金融终端</div>
-                        <div class="site-url">https://www.gw.com.cn</div>
-                        <div class="site-note">需下载软件</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">天眼查企业金融数据</div>
-                        <div class="site-url">https://www.tianyancha.com</div>
-                        <div class="site-note">企业信息查询</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">企查查行业报告</div>
-                        <div class="site-url">https://www.qcc.com</div>
-                        <div class="site-note">行业数据查询</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">理财魔方（智能投顾）</div>
-                        <div class="site-url">https://www.licaifan.com</div>
-                        <div class="site-note">需注册使用</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">且慢基金组合工具</div>
-                        <div class="site-url">https://qieman.com</div>
-                        <div class="site-note">基金投资工具</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">雪球基金筛选器</div>
-                        <div class="site-url">https://xueqiu.com</div>
-                        <div class="site-note">社区内工具</div>
-                    </div>
-                    <div class="site-card">
-                        <div class="site-name">支付宝理财计算器</div>
-                        <div class="site-url">支付宝App内搜索"理财计算器"</div>
-                        <div class="site-note">无独立链接</div>
-                    </div>
-                </div>
-            </div>
-       
+    <div class="category" id="news">
+      <div class="category-header">资讯文章类</div>
+      <div class="sites-container">
+        <div class="site-card">
+          <div class="site-name">华尔街日报中文网</div>
+          <div class="site-url">https://cn.wsj.com</div>
+          <div class="site-note">国际财经新闻</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">财经网</div>
+          <div class="site-url">https://www.caijing.com.cn</div>
+          <div class="site-note">国内财经资讯</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">第一财经</div>
+          <div class="site-url">https://www.yicai.com</div>
+          <div class="site-note">财经新闻与深度分析</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">界面新闻 - 金融板块</div>
+          <div class="site-url">https://www.jiemian.com</div>
+          <div class="site-note">主站地址，金融为子板块</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">经济观察网</div>
+          <div class="site-url">http://www.eeo.com.cn</div>
+          <div class="site-note">宏观经济与产业分析</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">福布斯中国</div>
+          <div class="site-url">https://www.forbeschina.com</div>
+          <div class="site-note">商业与财富报道</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">21世纪经济报道</div>
+          <div class="site-url">http://www.21jingji.com</div>
+          <div class="site-note">财经新闻与政策解读</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">和讯网</div>
+          <div class="site-url">https://www.hexun.com</div>
+          <div class="site-note">综合财经资讯</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">金融时报（FT中文网）</div>
+          <div class="site-url">https://www.ftchinese.com</div>
+          <div class="site-note">国际财经新闻中文版</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">财联社</div>
+          <div class="site-url">https://www.cls.cn</div>
+          <div class="site-note">实时财经快讯</div>
+        </div>
+      </div>
+  </div>
+
+  <!-- 视频课程类 -->
+  <div class="category" id="video">
+      <div class="category-header">视频课程类</div>
+      <div class="sites-container">
+        <div class="site-card">
+          <div class="site-name">B站财经UP主（如"巫师财经"）</div>
+          <div class="site-url">https://space.bilibili.com/319318239</div>
+          <div class="site-note">B站UP主频道</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">YouTube - 金融教育频道</div>
+          <div class="site-url">https://www.youtube.com</div>
+          <div class="site-note">搜索"The Plain Bagel"等频道</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">腾讯视频 - 金融公开课</div>
+          <div class="site-url">https://v.qq.com</div>
+          <div class="site-note">搜索"金融"相关课程</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">爱奇艺知识 - 金融专栏</div>
+          <div class="site-url">https://www.iqiyi.com/知识</div>
+          <div class="site-note">需订阅部分内容</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">优酷财经频道</div>
+          <div class="site-url">https://www.youku.com</div>
+          <div class="site-note">搜索"财经"栏目</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">中国证券网 - 视频讲堂</div>
+          <div class="site-url">http://www.cnstock.com</div>
+          <div class="site-note">主站地址，视频为子板块</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">网易公开课 - 金融专题</div>
+          <div class="site-url">https://open.163.com</div>
+          <div class="site-note">搜索"金融"课程</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">喜马拉雅 - 金融音频课</div>
+          <div class="site-url">https://www.ximalaya.com</div>
+          <div class="site-note">搜索"金融"相关内容</div>
+        </div>
+      </div>
+  </div>
+
+  <!-- 互动社区类 -->
+  <div class="category" id="community">
+      <div class="category-header">互动社区类</div>
+      <div class="sites-container">
+        <div class="site-card">
+          <div class="site-name">雪球社区</div>
+          <div class="site-url">https://xueqiu.com</div>
+          <div class="site-note">投资交流社区</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">集思录</div>
+          <div class="site-url">https://www.jisilu.cn</div>
+          <div class="site-note">低风险投资社区</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">同花顺论坛</div>
+          <div class="site-url">https://www.10jqka.com.cn</div>
+          <div class="site-note">主站地址，论坛为子板块</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">东方财富股吧</div>
+          <div class="site-url">https://guba.eastmoney.com</div>
+          <div class="site-note">股票讨论社区</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">知乎金融话题讨论区</div>
+          <div class="site-url">https://www.zhihu.com/topic/19559424</div>
+          <div class="site-note">用户问答与讨论</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">Reddit - r/investing</div>
+          <div class="site-url">https://www.reddit.com/r/investing</div>
+          <div class="site-note">英文投资社区</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">老虎证券社区</div>
+          <div class="site-url">https://www.laohu8.com</div>
+          <div class="site-note">美股投资社区</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">富途牛牛圈</div>
+          <div class="site-url">https://www.futunn.com</div>
+          <div class="site-note">港股与美股社区</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">英为财情（Investing.com）论坛</div>
+          <div class="site-url">https://www.investing.com</div>
+          <div class="site-note">国际金融社区</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">巴克莱银行投资者社区</div>
+          <div class="site-url">https://www.barclays.co.uk</div>
+          <div class="site-note">需登录查看</div>
+        </div>
+      </div>
+  </div>
+
+  <!-- 知识学习类 -->
+  <div class="category" id="learning">
+      <div class="category-header">知识学习类</div>
+      <div class="sites-container">
+        <div class="site-card">
+          <div class="site-name">中国金融培训中心</div>
+          <div class="site-url">http://www.chinacft.org</div>
+          <div class="site-note">金融行业培训</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">金融界学院</div>
+          <div class="site-url">http://edu.jrj.com.cn</div>
+          <div class="site-note">投资教育平台</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">好未来（学而思）金融课程</div>
+          <div class="site-url">https://www.100tal.com</div>
+          <div class="site-note">搜索"金融"课程</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">网易有道精品课 - 金融模块</div>
+          <div class="site-url">https://ke.youdao.com</div>
+          <div class="site-note">搜索"金融"课程</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">沪江网校 - 金融英语</div>
+          <div class="site-url">https://www.hujiang.com</div>
+          <div class="site-note">语言与金融结合课程</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">高顿教育 - CPA/CFA培训</div>
+          <div class="site-url">https://www.gaodun.com</div>
+          <div class="site-note">职业资格培训</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">腾讯课堂 - 金融实战课</div>
+          <div class="site-url">https://ke.qq.com</div>
+          <div class="site-note">搜索"金融"课程</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">得到APP - 香帅的金融学课</div>
+          <div class="site-url">https://www.dedao.cn</div>
+          <div class="site-note">需下载APP</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">极客时间 - 金融科技专栏</div>
+          <div class="site-url">https://time.geekbang.org</div>
+          <div class="site-note">科技与金融结合课程</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">小鹅通知识店铺（金融类）</div>
+          <div class="site-url">https://www.xiaoe-tech.com</div>
+          <div class="site-note">第三方知识店铺平台</div>
+        </div>
+      </div>
+  </div>
+
+  <!-- 工具服务类 -->
+  <div class="category" id="tools">
+      <div class="category-header">工具服务类</div>
+      <div class="sites-container">
+        <div class="site-card">
+          <div class="site-name">同花顺iFinD</div>
+          <div class="site-url">https://www.10jqka.com.cn</div>
+          <div class="site-note">需订阅终端</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">东方财富Choice数据</div>
+          <div class="site-url">https://choice.eastmoney.com</div>
+          <div class="site-note">金融数据终端</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">大智慧金融终端</div>
+          <div class="site-url">https://www.gw.com.cn</div>
+          <div class="site-note">需下载软件</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">天眼查企业金融数据</div>
+          <div class="site-url">https://www.tianyancha.com</div>
+          <div class="site-note">企业信息查询</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">企查查行业报告</div>
+          <div class="site-url">https://www.qcc.com</div>
+          <div class="site-note">行业数据查询</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">理财魔方（智能投顾）</div>
+          <div class="site-url">https://www.licaifan.com</div>
+          <div class="site-note">需注册使用</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">且慢基金组合工具</div>
+          <div class="site-url">https://qieman.com</div>
+          <div class="site-note">基金投资工具</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">雪球基金筛选器</div>
+          <div class="site-url">https://xueqiu.com</div>
+          <div class="site-note">社区内工具</div>
+        </div>
+        <div class="site-card">
+          <div class="site-name">支付宝理财计算器</div>
+          <div class="site-url">支付宝App内搜索"理财计算器"</div>
+          <div class="site-note">无独立链接</div>
+        </div>
+      </div>
+  </div>
+
+  <footer>
+    <p>© 2025 金融知识导航</p>
+  </footer>
+
+</body>
+
+
+<script>
+  const navItems = document.querySelectorAll('.nav-item');
+  const categories = document.querySelectorAll('.category');
+  navItems.forEach(item => {
+      item.addEventListener('click', () => {
+          navItems.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+
+          const category = item.getAttribute('data-category');
+          categories.forEach(cat => {
+              cat.classList.remove('active');
+              if (cat.id === category) {
+                  cat.classList.add('active');
+              }
+          });
+      });
+  });
+  
+
+</script>
+          
+
+              
