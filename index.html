@@ -853,6 +853,16 @@
 
 
 <script>
+   document.addEventListener('DOMContentLoaded', function() {
+        // 获取 id 为 basic 的分类
+        const defaultCategory = document.getElementById('basic');
+        
+        // 如果该元素存在，显示该元素
+        if (defaultCategory) {
+            defaultCategory.style.display = 'block';
+        }
+    });  
+    
   const navItems = document.querySelectorAll('.nav-item');
   const categories = document.querySelectorAll('.category');
   navItems.forEach(item => {
