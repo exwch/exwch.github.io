@@ -257,7 +257,7 @@
             <h1>金融知识导航</h1>
             <p class="subtitle">一站式金融学习资源平台</p>
         </div>
-    <button id="donate-btn">打赏支持💰</button>
+    <button id="donate-btn">打赏支持</button>
 
     </header>
     
@@ -283,7 +283,7 @@
             <h3>感谢您的支持</h3>
             <p>请使用微信扫码打赏</p>
             <!-- 替换为你的微信收款码图片 -->
-            <img src="https://exwch.github.io/qrcode.jpg" alt="微信收款码">
+            <img src="qrcode.jpg" alt="微信收款码">
             <button id="close-btn">关闭</button>
 
         </div>
@@ -853,32 +853,39 @@
 
 
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-        // 获取 id 为 basic 的分类
-        const defaultCategory = document.getElementById('basic');
-        
-        // 如果该元素存在，显示该元素
-        if (defaultCategory) {
-            defaultCategory.style.display = 'block';
-        }
-    });  
-    
-  const navItems = document.querySelectorAll('.nav-item');
-  const categories = document.querySelectorAll('.category');
-  navItems.forEach(item => {
-      item.addEventListener('click', () => {
-          navItems.forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取所有的导航项和分类元素
+    const navItems = document.querySelectorAll('.nav-item');
+    const categories = document.querySelectorAll('.category');
 
-          const category = item.getAttribute('data-category');
-          categories.forEach(cat => {
-              cat.classList.remove('active');
-              if (cat.id === category) {
-                  cat.classList.add('active');
-              }
-          });
-      });
-  });
+    // 默认显示第一个分类（例如 id="basic" 的分类）并激活对应的导航项
+    const defaultCategory = document.getElementById('basic');
+    if (defaultCategory) {
+        defaultCategory.classList.add('active'); // 激活默认分类
+    }
+
+    if (navItems.length > 0) {
+        navItems[0].classList.add('active'); // 激活第一个导航项
+    }
+
+    // 点击导航项时切换显示对应的分类
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // 去除所有导航项的 'active' 类
+            navItems.forEach(i => i.classList.remove('active'));
+            // 为当前点击的导航项添加 'active' 类
+            item.classList.add('active');
+
+            const category = item.getAttribute('data-category');
+            categories.forEach(cat => {
+                cat.classList.remove('active');  // 移除所有分类的 'active' 类
+                if (cat.id === category) {
+                    cat.classList.add('active');  // 显示对应的分类
+                }
+            });
+        });
+    });
+});
   
   const donateBtn = document.getElementById('donate-btn');
         const modal = document.getElementById('qrcode-modal');
