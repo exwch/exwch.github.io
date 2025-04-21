@@ -17,7 +17,52 @@
             color: #333;
             line-height: 1.6;
         }
-        
+        #donate-btn {
+            background-color: #07C160;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #donate-btn:hover {
+            background-color: #06AD56;
+        }
+        #qrcode-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        #qrcode-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 80%;
+        }
+        #qrcode-content img {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            margin: 10px 0;
+        }
+        #close-btn {
+            margin-top: 15px;
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
         header {
             background: linear-gradient(135deg, #144a87 0%, #071420 51%, #163e5e 100%);
             color: white;
@@ -212,6 +257,8 @@
             <h1>金融知识导航</h1>
             <p class="subtitle">一站式金融学习资源平台</p>
         </div>
+    <button id="donate-btn">打赏支持</button>
+
     </header>
     
     <nav>
@@ -228,6 +275,19 @@
             <div class="nav-item" data-category="tools">工具服务</div>
         </div>
     </nav>
+   
+
+    <!-- 微信收款码弹窗 -->
+    <div id="qrcode-modal">
+        <div id="qrcode-content">
+            <h3>感谢您的支持</h3>
+            <p>请使用微信扫码打赏</p>
+            <!-- 替换为你的微信收款码图片 -->
+            <img src="qrcode.jpg" alt="微信收款码">
+            <button id="close-btn">关闭</button>
+
+        </div>
+    </div>
 
     <div class="container content">
         <div class="search-container">
@@ -810,7 +870,26 @@
       });
   });
   
+  const donateBtn = document.getElementById('donate-btn');
+        const modal = document.getElementById('qrcode-modal');
+        const closeBtn = document.getElementById('close-btn');
 
+        // 点击打赏按钮显示弹窗
+        donateBtn.addEventListener('click', function() {
+            modal.style.display = 'flex';
+        });
+
+        // 点击关闭按钮隐藏弹窗
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        // 点击模态框背景也关闭弹窗
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
 </script>
           
 
