@@ -60,6 +60,9 @@ body.touch .dpad{display:grid}
 .dbtn:active,.dbtn.on{background:rgba(255,176,32,.22);border-color:rgba(255,176,32,.5)}
 .dbtn.boost{font-size:12px;font-weight:800;letter-spacing:.06em;color:#0f1a12;background:linear-gradient(180deg,#8ef0c8,#41c79a);border-color:rgba(140,240,200,.5)}
 .dbtn.boost.on{background:linear-gradient(180deg,#c8ffe9,#63e0b4)}
+.cheatbadge{display:none;align-items:center;font-size:11px;font-weight:800;letter-spacing:.08em;color:#241703;background:linear-gradient(180deg,#ffd76a,#ffb020);padding:4px 9px;border-radius:999px;box-shadow:0 0 12px rgba(255,176,32,.55);animation:cpulse 1.4s ease-in-out infinite}
+.cheatbadge.show{display:inline-flex}
+@keyframes cpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 </style>
 </head>
 <body>
@@ -68,6 +71,7 @@ body.touch .dpad{display:grid}
     <div class="stat">得分<b id="hudScore">0</b></div>
     <div class="stat">车厢<b id="hudCars">0</b></div>
     <div class="stat amber">最佳<b id="hudBest">0</b></div>
+    <div class="cheatbadge" id="cheatBadge">无敌模式</div>
     <div class="spacer"></div>
     <div class="meter combo" id="comboWrap"><span id="comboTxt">连击</span><i><em id="comboBar"></em></i></div>
     <div class="meter nitro" id="nitroWrap"><span>氮气</span><i><em id="nitroBar"></em></i></div>
@@ -180,6 +184,8 @@ const Sound = {
   boostTick(){ this.noise(0.14,0.05,500,1800); },
   boostOff(){ this.blip(420,0.22,{type:'sawtooth',vol:0.06,slide:-260}); },
   crash(){ this.noise(0.6,0.34,1800,120); this.blip(170,0.5,{type:'sawtooth',vol:0.13,slide:-120}); },
+  cheatOn(){ [523,659,880,1174].forEach((f,i)=>this.blip(f,0.14,{type:'triangle',vol:0.09,delay:i*0.07})); },
+  cheatOff(){ [880,659,494].forEach((f,i)=>this.blip(f,0.13,{type:'triangle',vol:0.07,delay:i*0.07})); },
   go(){ this.blip(440,0.13,{type:'square',vol:0.06}); this.blip(680,0.16,{type:'square',vol:0.06,delay:0.12}); }
 };
 const S = {
@@ -189,6 +195,7 @@ const S = {
   shake:0, hitStop:0, flash:0, flashColor:'#ffffff',
   combo:0, comboT:0, comboMax:0, nitro:0.45, boosting:false, boostTick:0,
   kills:0, spawnTimer:0, menuAngle:0, overT:0, reason:'', markT:0, smokeT:0,
+  invincible:false, cheatUsed:false, wallFxT:0,
   wheelL:{x:0,y:0}, wheelR:{x:0,y:0}, wheelsReady:false
 };
 try { S.best = parseInt(localStorage.getItem('truck-snake-best')||'0',10) || 0; } catch(e){ S.best = 0; }
@@ -214,6 +221,7 @@ function resetGame(){
   S.rings.length = 0; S.marks.length = 0; S.flashes.length = 0;
   S.shake = 0; S.hitStop = 0; S.flash = 0; S.spawnTimer = 0.2; S.reason = '';
   S.combo = 0; S.comboT = 0; S.comboMax = 0; S.nitro = 0.45;
+  S.cheatUsed = !!S.invincible; S.wallFxT = 0;
   S.boosting = false; S.boostTick = 0; S.kills = 0; S.overT = 0;
   S.bikes.length = 0;
   placeHead(AR.x + AR.w*0.5 - 190, AR.y + AR.h*0.5, 0, 1);
@@ -386,7 +394,18 @@ function stepHead(dt){
   sampleMarks(dt);
   sampleSmoke(dt);
   const h = S.head, pad = 20;
-  if(h.x < AR.x+pad || h.x > AR.x+AR.w-pad || h.y < AR.y+pad || h.y > AR.y+AR.h-pad) crash('wall');
+  const oX = h.x < AR.x+pad || h.x > AR.x+AR.w-pad;
+  const oY = h.y < AR.y+pad || h.y > AR.y+AR.h-pad;
+  if(oX || oY){
+    if(S.invincible){
+      if(oX) h.x = clamp(h.x, AR.x+pad, AR.x+AR.w-pad);
+      if(oY) h.y = clamp(h.y, AR.y+pad, AR.y+AR.h-pad);
+      if(S.wallFxT <= 0){
+        S.wallFxT = 0.1;
+        burst(h.x, h.y, '#ffd166', 6);
+      }
+    } else crash('wall');
+  }
 }
 
 function stepMenu(dt){
@@ -441,6 +460,7 @@ function collide(){
     }
     if(S.mode !== 'play') return;
   }
+  if(S.invincible) return;
   const h = S.head;
   for(let i=1;i<S.body.length;i++){
     const s = S.body[i];
@@ -496,7 +516,7 @@ function crash(reason){
   burst(S.head.x, S.head.y, '#ffe08a', 16);
   addRing(S.head.x, S.head.y, '255,138,61', 150);
   Sound.crash();
-  if(S.score > S.best){
+  if(!S.cheatUsed && S.score > S.best){
     S.best = S.score;
     try { localStorage.setItem('truck-snake-best', String(S.best)); } catch(e){}
   }
@@ -585,6 +605,7 @@ window.addEventListener('keydown', function(e){
   }
   if(e.key === 'Shift'){ boostKey = true; return; }
   if(e.key === 'p' || e.key === 'P' || e.key === 'Escape'){ e.preventDefault(); togglePause(); }
+  if(e.key === 'm' || e.key === 'M'){ e.preventDefault(); toggleInvincible(); return; }
   if(e.key === 'r' || e.key === 'R'){ startGame(); }
 }, {passive:false});
 
@@ -719,6 +740,15 @@ function drawWalls(){
 function drawCab(x,y,a){
   ctx.save();
   ctx.translate(x,y); ctx.rotate(a);
+  if(S.invincible){
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,209,102,.95)';
+    ctx.shadowBlur = 16 + 8*Math.abs(Math.sin(S.t*6));
+    ctx.strokeStyle = 'rgba(255,209,102,.85)';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.arc(0,0,31,0,TAU); ctx.stroke();
+    ctx.restore();
+  }
   if(S.boosting){
     for(let i=-1;i<=1;i+=2){
       const f = 0.7 + Math.random()*0.7;
@@ -909,6 +939,15 @@ function draw(){
   drawFlashes();
   for(let i=S.body.length-1;i>=0;i--) drawTrailer(S.body[i].x, S.body[i].y, S.body[i].a, i);
   drawCab(S.head.x, S.head.y, S.head.angle);
+  if(S.invincible){
+    ctx.save();
+    ctx.globalAlpha = 0.5 + 0.32*Math.abs(Math.sin(S.t*5));
+    ctx.font = '800 15px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffd166';
+    ctx.fillText('无敌', S.head.x, S.head.y - 36);
+    ctx.restore();
+  }
   drawRings();
   drawParts();
   drawTexts();
@@ -926,6 +965,7 @@ function update(dt){
   S.t += dt;
   S.shake = Math.max(0, S.shake - dt*2.4);
   S.flash = Math.max(0, S.flash - dt*2.0);
+  if(S.wallFxT > 0) S.wallFxT -= dt;
   if(S.comboT > 0){
     S.comboT -= dt;
     if(S.comboT <= 0){ S.comboT = 0; S.combo = 0; }
@@ -937,7 +977,7 @@ function update(dt){
     if(S.boosting && !was) Sound.boostOn();
     if(!S.boosting && was) Sound.boostOff();
     if(S.boosting){
-      S.nitro = Math.max(0, S.nitro - BOOST_DRAIN*dt);
+      S.nitro = S.invincible ? 1 : Math.max(0, S.nitro - BOOST_DRAIN*dt);
       S.boostTick -= dt;
       if(S.boostTick <= 0){ S.boostTick = 0.12; Sound.boostTick(); }
     } else S.boostTick = 0;
@@ -1023,10 +1063,10 @@ function showMenu(){
 
 function showGameOver(){
   const reason = S.reason === 'wall' ? '撞上了护栏' : (S.reason === 'bike' ? '被摩托车撞上了车厢' : '咬到了自己的车厢');
-  const isBest = S.score >= S.best && S.score > 0;
+  const isBest = !S.cheatUsed && S.score >= S.best && S.score > 0;
   showVeil(
     '<div class="card">' +
-      '<div class="badge">' + (isBest ? 'NEW RECORD' : '撞车现场') + '</div>' +
+      '<div class="badge">' + (S.cheatUsed ? '无敌模式 · 不计最佳' : (isBest ? 'NEW RECORD' : '撞车现场')) + '</div>' +
       '<h1>撞车了</h1>' +
       '<p class="sub">' + reason + '。下次把车头留出转弯空间，长车头转弯半径可不小。</p>' +
       '<div class="ostats">' +
@@ -1054,6 +1094,17 @@ function showPause(){
       '</div>' +
     '</div>'
   );
+}
+
+function toggleInvincible(){
+  S.invincible = !S.invincible;
+  if(S.invincible) S.cheatUsed = true;
+  const badge = $('#cheatBadge');
+  if(badge) badge.classList.toggle('show', S.invincible);
+  if(S.invincible){ S.nitro = 1; S.hitStop = 0.06; Sound.cheatOn(); }
+  else Sound.cheatOff();
+  addText(S.head.x, S.head.y - 48, S.invincible ? '无敌模式 ON' : '无敌模式 OFF', '按 M 切换', S.invincible ? '#ffd166' : '#9aa5b8');
+  S.shake = Math.min(1.2, S.shake + 0.3);
 }
 
 function startGame(){
