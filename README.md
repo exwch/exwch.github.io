@@ -1,68 +1,62 @@
-# 双人冒险 · Super Duo Bros（网页端 Demo）
+# 网页游戏合集 · Web Game Collection
 
-一个纯前端、零依赖的双人横版闯关 Demo。**双击 `index.html` 即可运行**（不需要装任何东西，也不需要本地服务器）。
+学生用 HTML + Canvas 写的网页小游戏合集。全部是纯前端、零依赖，打开网页就能玩。
 
-![标题界面](preview-title.png)
-![游戏画面](preview-play.png)
+线上地址：<https://exwch.github.io/>
 
-## 玩法特性
+## 包含的游戏
 
-| 特性 | 说明 |
-| --- | --- |
-| 同屏双人 | 一台键盘两个人玩，镜头自动跟随并会随两人拉开距离缩小 |
-| 冲刺加速跑 | 按住冲刺键，最高速度约提升 70%，起跳距离明显变远，带残影与尘土 |
-| 飞行（最多 5 秒） | 长按飞行键起飞，能量条 5 秒耗尽；落地缓慢回充，吃金币可立刻补 0.8 秒 |
-| 大跳 / 小跳 | 轻点 = 小跳，按住 = 大跳（最高约 6 格），含土狼时间与跳跃缓冲手感优化 |
-| 专属技能 | P1 火焰弹（远程消灭敌人）；P2 旋风冲刺（无敌突进、撞击消灭敌人） |
-| 关卡 | 2 张手工关卡：青草原（白天）与熔岩夜窟（夜晚），含金币、问号砖、弹簧、尖刺、熔岩、坑洞 |
-| 生命与复活 | 每人 3 颗心，受伤无敌帧；倒地 8 秒后自动复活，两人同时倒地则结束 |
+| 游戏 | 目录 | 玩法简介 |
+| --- | --- | --- |
+| 双人冒险 · Super Duo Bros | `mario/` | 同屏双人横版闯关：冲刺加速跑、最多 5 秒飞行、大跳小跳、每人一个专属技能，两人都碰到旗杆才过关 |
+| 货车贪吃蛇 · Truck Snake | `truck-snake/` | 开一辆不会掉头的长头卡车撞摩托，每撞毁一辆多挂一节车厢，连击越高氮气越快，车越长转弯半径越大 |
+| 怒鸟战术 · Angry Tactics | `angry-tactics/` | 卡牌回合 + 愤怒的小鸟弹射物理：出牌、拖拽瞄准、松手发射，飞行中点一下触发小鸟技能 |
 
-## 操作
+## 本地运行
 
-**玩家 1 · 小红**
+直接双击根目录的 `index.html`（合集首页），点卡片进入任意游戏即可。
+每个游戏的子目录里也有自己的 `index.html`，可以单独打开。
 
-- `A` / `D` 左右移动
-- `W` 跳跃（轻点小跳 / 长按大跳）
-- `Shift`（左）冲刺
-- `S` 长按飞行
-- `J` 技能：火焰弹
+如果要用本地服务器（可选）：
 
-**玩家 2 · 小绿**
-
-- `←` / `→` 左右移动
-- `↑` 跳跃（轻点小跳 / 长按大跳）
-- `Shift`（右）或小键盘 `0` 冲刺
-- `↓` 长按飞行
-- `/` 技能：旋风冲刺
-
-**通用**：`Enter`/空格 开始与继续，`P`/`Esc` 暂停，`R` 重开本关，`M` 静音。
-
-## 开发小工具
-
-- 游戏对象挂在 `window.game` 上，打开浏览器控制台即可实时调参、看状态。
-- 按 `F3`（或在网址后加 `?debug=1`）会打开左下角调试面板，实时显示两人坐标、速度、飞行能量、技能冷却与镜头缩放。
-- 所有手感参数都在 `js/config.js`，改完刷新即可生效。
-
-## 文件结构
-
-```
-duo-bros/
-├─ index.html      页面与操作说明
-├─ styles.css      页面样式
-├─ js/
-│  ├─ config.js    所有手感参数（重力、速度、飞行时长等，改这里调手感）
-│  ├─ input.js     键盘输入（边沿检测 / 缓冲）
-│  ├─ audio.js     WebAudio 音效合成（无音频文件）
-│  ├─ level.js     关卡数据与关卡生成器
-│  ├─ entities.js  玩家、敌人、火球、粒子、瓦片碰撞
-│  ├─ render.js    像素风绘制与 HUD
-│  └─ game.js      主循环、镜头、游戏流程
-├─ tools/
-│  ├─ simtest.js   无头物理仿真测试（node tools/simtest.js）
-│  └─ rendertest.js 渲染冒烟测试（node tools/rendertest.js）
-└─ README.md
+```bash
+python -m http.server 8000
+# 然后浏览 http://localhost:8000
 ```
 
-想改手感直接看 `js/config.js`，比如 `FLY_MAX = 5.0` 就是飞行上限秒数，`SPRINT_MAX` 是冲刺最高速度。
+## 目录结构
 
-改完参数建议跑一次回归：`node tools/simtest.js`（27 项玩法断言）与 `node tools/rendertest.js`（全部绘制路径）。
+```
+exwch.github.io/
+├─ index.html              合集首页（三张游戏卡片）
+├─ mario/                  双人冒险（马里奥）
+│  ├─ index.html
+│  ├─ styles.css
+│  ├─ js/                  渲染 / 物理 / 关卡 / 音效等模块
+│  ├─ tools/               无头测试脚本（node tools/simtest.js）
+│  └─ preview-*.png
+├─ truck-snake/
+│  └─ index.html           单文件游戏（内联 CSS + JS）
+└─ angry-tactics/
+   ├─ index.html
+   ├─ css/style.css
+   ├─ js/                  physics.js / data.js / game.js
+   └─ README.md
+```
+
+## 新增一个游戏
+
+1. 在仓库根目录新建一个文件夹，例如 `mygame/`，把游戏放进去，入口文件命名为 `index.html`。
+2. 如果游戏引用了自己的 css / js / 图片，保持相对路径即可；不要用 `C:\...` 这样的绝对路径。
+3. 在根目录 `index.html` 的 `<main class="grid">` 里复制一张卡片，改掉 `href`、标题、简介和预览图。
+4. 建议在游戏页面里放一个返回入口：`<a href="../index.html">🏠 合集</a>`，方便回到首页。
+
+## 发布到 GitHub Pages
+
+```bash
+git add -A
+git commit -m "更新游戏合集"
+git push
+```
+
+推送到 `main` 分支后，GitHub Pages 会自动更新 <https://exwch.github.io/>（通常 1 分钟内生效）。

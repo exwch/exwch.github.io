@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>怒鸟战术 · Angry Tactics</title>
+<meta name="description" content="卡牌策略 + 愤怒的小鸟弹射物理，纯网页 Demo">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <header id="top">
+    <div class="logo">🐦 怒鸟战术</div>
+    <div class="pills">
+      <span class="pill" id="pLevel">关卡 1</span>
+      <span class="pill" id="pRound">回合 1/5</span>
+      <span class="pill" id="pPig">🐷 0</span>
+      <span class="pill" id="pScore">⭐ 0</span>
+    </div>
+    <div class="btns">
+      <a class="mini" href="../index.html" title="返回游戏合集" style="text-decoration:none;display:inline-block">🏠 合集</a>
+      <button class="mini" id="bHelp" type="button">玩法</button>
+      <button class="mini" id="bRestart" type="button">重开</button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <div id="wrap">
+      <canvas id="game" width="1280" height="720"></canvas>
+      <div id="ov"></div>
+    </div>
+  </main>
+
+  <footer id="dock">
+    <div class="energy">
+      <div class="etitle">能 量</div>
+      <div class="pips" id="pips"></div>
+    </div>
+    <div id="hand"></div>
+    <div class="right">
+      <button id="bEnd" type="button">结束回合</button>
+      <div id="deckInfo">牌堆 0 · 弃牌 0</div>
+    </div>
+  </footer>
+
+</div>
+
+<script src="js/physics.js"></script>
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

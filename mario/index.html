@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>双人冒险 · Super Duo Bros</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <h1>双人冒险 <span class="sub">SUPER DUO BROS</span></h1>
+      <div class="topbtns">
+        <a class="toplink" href="../index.html">🏠 合集</a>
+        <button id="btnMute" type="button" title="静音 / 开音效 (M)">🔊 音效</button>
+        <button id="btnFull" type="button" title="全屏">⛶ 全屏</button>
+      </div>
+    </header>
+
+    <div id="frame">
+      <canvas id="game" width="960" height="544"></canvas>
+      <pre id="debug" hidden></pre>
+    </div>
+
+    <section id="legend">
+      <div class="card p1">
+        <div class="who">玩家 1 · 小红</div>
+        <ul>
+          <li><b>A / D</b> 左右移动</li>
+          <li><b>W</b> 跳跃（轻点=小跳，长按=大跳）</li>
+          <li><b>Shift（左）</b> 冲刺加速跑</li>
+          <li><b>S</b> 长按飞行（最多 5 秒）</li>
+          <li><b>J</b> 技能：火焰弹</li>
+        </ul>
+      </div>
+      <div class="card p2">
+        <div class="who">玩家 2 · 小绿</div>
+        <ul>
+          <li><b>← / →</b> 左右移动</li>
+          <li><b>↑</b> 跳跃（轻点=小跳，长按=大跳）</li>
+          <li><b>Shift（右）/ 小键盘0</b> 冲刺加速跑</li>
+          <li><b>↓</b> 长按飞行（最多 5 秒）</li>
+          <li><b>/（斜杠）</b> 技能：旋风冲刺</li>
+        </ul>
+      </div>
+      <div class="card other">
+        <div class="who">通用</div>
+        <ul>
+          <li><b>Enter / 空格</b> 开始 / 继续</li>
+          <li><b>P / Esc</b> 暂停</li>
+          <li><b>R</b> 重新开始本关</li>
+          <li><b>M</b> 静音切换</li>
+          <li>两人都碰到旗杆才算通关</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

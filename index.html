@@ -1,66 +1,290 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>双人冒险 · Super Duo Bros</title>
-<link rel="stylesheet" href="styles.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网页游戏合集 · Web Game Collection</title>
+<meta name="description" content="学生网页游戏作品合集：双人冒险（马里奥）、货车贪吃蛇、怒鸟战术（愤怒的小鸟）。纯前端，打开即玩。">
+<style>
+  :root {
+    --ink: #e9edff;
+    --muted: #97a0c4;
+    --line: #2f3765;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background:
+      radial-gradient(1100px 560px at 50% -8%, #2a3260 0%, transparent 62%),
+      linear-gradient(180deg, #0d1020 0%, #171b34 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 56px 20px 64px;
+  }
+
+  header .kicker {
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    margin: 10px 0 12px;
+    font-size: clamp(28px, 5vw, 44px);
+    letter-spacing: 2px;
+    background: linear-gradient(120deg, #fff6c9 0%, #ffd93b 45%, #ff9f43 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  header p {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 22px;
+    margin: 40px 0 0;
+  }
+
+  .card {
+    --accent: #8ab4ff;
+    display: flex;
+    flex-direction: column;
+    background: rgba(30, 36, 68, .62);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+
+  .card:hover,
+  .card:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    outline: none;
+  }
+
+  .thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #0a0d1c;
+    overflow: hidden;
+  }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(13, 16, 32, .78) 100%);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 20px 20px;
+    flex: 1;
+  }
+
+  .body h2 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .body h2 span {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .body p {
+    margin: 0;
+    color: #c4cdf0;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tags li {
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #1b2143;
+    border: 1px solid #363e70;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .keys {
+    margin-top: auto;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .keys b {
+    color: #fff;
+    background: #1b2143;
+    border: 1px solid #363e70;
+    border-radius: 5px;
+    padding: 1px 6px;
+    font-weight: 600;
+  }
+
+  .play {
+    align-self: flex-start;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .card:hover .play { text-decoration: underline; }
+
+  footer {
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  footer code {
+    background: #1b2143;
+    border: 1px solid #363e70;
+    border-radius: 5px;
+    padding: 1px 6px;
+    font-size: 12px;
+  }
+</style>
 </head>
 <body>
-  <div id="app">
-    <header id="topbar">
-      <h1>双人冒险 <span class="sub">SUPER DUO BROS</span></h1>
-      <div class="topbtns">
-        <button id="btnMute" type="button" title="静音 / 开音效 (M)">🔊 音效</button>
-        <button id="btnFull" type="button" title="全屏">⛶ 全屏</button>
-      </div>
+  <div class="page">
+    <header>
+      <div class="kicker">Web Game Collection</div>
+      <h1>网页游戏合集</h1>
+      <p>
+        三个纯前端小游戏，都是用 HTML + Canvas 写的，不需要安装任何东西：打开页面就能玩。
+        点开任意一张卡片即进入对应游戏，游戏内右上角的 🏠 按钮可以随时回到这里。
+      </p>
     </header>
 
-    <div id="frame">
-      <canvas id="game" width="960" height="544"></canvas>
-      <pre id="debug" hidden></pre>
-    </div>
+    <main class="grid">
+      <a class="card" href="mario/index.html" style="--accent:#ff5a5f">
+        <div class="thumb">
+          <img src="mario/preview-play.png" alt="双人冒险 游戏画面" loading="lazy">
+        </div>
+        <div class="body">
+          <h2>双人冒险 <span>SUPER DUO BROS</span></h2>
+          <p>同屏双人横版闯关。按住冲刺键加速跑，空中长按可以飞起来（最多 5 秒），跳跃轻点是
+             小跳、长按是大跳，两个人各有一个专属技能。两人都碰到旗杆才算过关。</p>
+          <ul class="tags">
+            <li>双人同屏</li>
+            <li>冲刺加速跑</li>
+            <li>飞行 5 秒</li>
+            <li>大跳 / 小跳</li>
+            <li>火焰弹 · 旋风冲刺</li>
+            <li>2 张关卡</li>
+          </ul>
+          <div class="keys">
+            玩家1：<b>A</b> <b>D</b> 移动 · <b>W</b> 跳 · <b>左Shift</b> 冲刺 · <b>S</b> 飞行 · <b>J</b> 火焰弹<br>
+            玩家2：<b>←</b> <b>→</b> 移动 · <b>↑</b> 跳 · <b>右Shift</b> 冲刺 · <b>↓</b> 飞行 · <b>/</b> 旋风冲刺
+          </div>
+          <span class="play">开始游戏 →</span>
+        </div>
+      </a>
 
-    <section id="legend">
-      <div class="card p1">
-        <div class="who">玩家 1 · 小红</div>
-        <ul>
-          <li><b>A / D</b> 左右移动</li>
-          <li><b>W</b> 跳跃（轻点=小跳，长按=大跳）</li>
-          <li><b>Shift（左）</b> 冲刺加速跑</li>
-          <li><b>S</b> 长按飞行（最多 5 秒）</li>
-          <li><b>J</b> 技能：火焰弹</li>
-        </ul>
-      </div>
-      <div class="card p2">
-        <div class="who">玩家 2 · 小绿</div>
-        <ul>
-          <li><b>← / →</b> 左右移动</li>
-          <li><b>↑</b> 跳跃（轻点=小跳，长按=大跳）</li>
-          <li><b>Shift（右）/ 小键盘0</b> 冲刺加速跑</li>
-          <li><b>↓</b> 长按飞行（最多 5 秒）</li>
-          <li><b>/（斜杠）</b> 技能：旋风冲刺</li>
-        </ul>
-      </div>
-      <div class="card other">
-        <div class="who">通用</div>
-        <ul>
-          <li><b>Enter / 空格</b> 开始 / 继续</li>
-          <li><b>P / Esc</b> 暂停</li>
-          <li><b>R</b> 重新开始本关</li>
-          <li><b>M</b> 静音切换</li>
-          <li>两人都碰到旗杆才算通关</li>
-        </ul>
-      </div>
-    </section>
+      <a class="card" href="truck-snake/index.html" style="--accent:#ffb347">
+        <div class="thumb">
+          <img src="truck-snake/preview.png" alt="货车贪吃蛇 游戏画面" loading="lazy">
+        </div>
+        <div class="body">
+          <h2>货车贪吃蛇 <span>TRUCK SNAKE</span></h2>
+          <p>你是一辆不能掉头的长头卡车：车头撞、车厢蹭，摩托车碰着你的车队就报废。
+             每撞毁一辆就多挂一节车厢，连击越高氮气充得越快——车越长转弯半径越大，胆大也要心细。</p>
+          <ul class="tags">
+            <li>货车拖挂</li>
+            <li>氮气冲刺</li>
+            <li>连击倍率</li>
+            <li>越开越长</li>
+            <li>手机方向键</li>
+          </ul>
+          <div class="keys">
+            <b>↑</b> <b>↓</b> <b>←</b> <b>→</b> 转向 · <b>空格</b> / <b>Shift</b> 氮气冲刺 ·
+            <b>P</b> 暂停 · <b>R</b> 重开 · <b>M</b> 无敌模式
+          </div>
+          <span class="play">开始游戏 →</span>
+        </div>
+      </a>
+
+      <a class="card" href="angry-tactics/index.html" style="--accent:#7ee8ff">
+        <div class="thumb">
+          <img src="angry-tactics/preview.png" alt="怒鸟战术 游戏画面" loading="lazy">
+        </div>
+        <div class="body">
+          <h2>怒鸟战术 <span>ANGRY TACTICS</span></h2>
+          <p>卡牌策略 + 愤怒的小鸟弹射物理。每回合用能量出牌，把小动物架上弹弓，拖拽瞄准、
+             松手发射，飞行中再点一下触发专属技能。打断支柱让建筑塌下来砸猪，往往比硬砸更划算。</p>
+          <ul class="tags">
+            <li>弹射物理</li>
+            <li>卡牌回合</li>
+            <li>六种小鸟技能</li>
+            <li>三星评价</li>
+            <li>3 张关卡</li>
+          </ul>
+          <div class="keys">
+            <b>鼠标拖拽</b> 瞄准并发射 · <b>点击画面</b> 触发小鸟技能 · <b>结束回合</b> 抽牌 +2 能量
+          </div>
+          <span class="play">开始游戏 →</span>
+        </div>
+      </a>
+    </main>
+
+    <footer>
+      全部为纯前端实现，可直接用浏览器打开本地文件，也可以部署到 GitHub Pages。<br>
+      目录结构：<code>mario/</code> · <code>truck-snake/</code> · <code>angry-tactics/</code>
+    </footer>
   </div>
-
-  <script src="js/config.js"></script>
-  <script src="js/input.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/level.js"></script>
-  <script src="js/entities.js"></script>
-  <script src="js/render.js"></script>
-  <script src="js/game.js"></script>
 </body>
 </html>

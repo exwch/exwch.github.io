@@ -1,0 +1,174 @@
+/* ============================================================
+   style.css — 怒鸟战术
+   ============================================================ */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: #0b1017; color: #e9f0f8;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  user-select: none; -webkit-user-select: none;
+}
+
+#app { height: 100%; display: flex; flex-direction: column; }
+
+/* ---------------- 顶栏 ---------------- */
+#top {
+  display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+  background: linear-gradient(180deg, #1c2634, #131a24);
+  border-bottom: 1px solid #2b3849; flex: 0 0 auto;
+}
+.logo {
+  font-weight: 800; font-size: 16px; letter-spacing: .5px; white-space: nowrap;
+  background: linear-gradient(90deg, #ffcf4d, #ff7a45);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.pills { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+.pill {
+  font-size: 12px; padding: 4px 11px; border-radius: 99px;
+  background: #1f2b3b; border: 1px solid #2f3f54; color: #b9cade; white-space: nowrap;
+}
+.btns { display: flex; gap: 6px; }
+.mini {
+  font: inherit; font-size: 12px; padding: 5px 12px; border-radius: 8px; cursor: pointer;
+  background: #243244; border: 1px solid #38495f; color: #d7e4f2; transition: .15s;
+}
+.mini:hover { background: #2e405a; border-color: #4c6383; }
+
+/* ---------------- 舞台 ---------------- */
+#stage {
+  flex: 1 1 auto; position: relative; display: flex; align-items: center; justify-content: center;
+  padding: 8px; min-height: 0;
+  background: radial-gradient(120% 90% at 50% 0%, #16202c, #0b1017 70%);
+}
+/* 尺寸由 JS 按 16:9 精确计算，避免 max-height 压扁画布造成画面拉伸 */
+#wrap {
+  position: relative; display: flex; flex: 0 0 auto;
+}
+#game {
+  display: block; border-radius: 14px; touch-action: none;
+  box-shadow: 0 18px 50px rgba(0,0,0,.55), 0 0 0 1px #2b3849;
+  background: #0d1420;
+}
+
+/* ---------------- 底栏 ---------------- */
+#dock {
+  flex: 0 0 auto; display: flex; align-items: stretch; gap: 12px; padding: 9px 14px 12px;
+  background: linear-gradient(180deg, #141b26, #0f151d); border-top: 1px solid #2b3849;
+}
+.energy { display: flex; flex-direction: column; justify-content: center; gap: 6px; flex: 0 0 auto; }
+.etitle { font-size: 11px; color: #8ba0b8; letter-spacing: 2px; }
+.pips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.pip { width: 15px; height: 9px; border-radius: 3px; background: #26333f; transition: .2s; }
+.pip.on {
+  background: linear-gradient(180deg, #ffe27a, #f5a623);
+  box-shadow: 0 0 7px rgba(245,166,35,.75);
+}
+
+#hand {
+  flex: 1 1 auto; display: flex; gap: 9px; overflow-x: auto; overflow-y: hidden;
+  padding: 4px 2px 6px; scrollbar-width: thin; min-height: 0;
+}
+#hand::-webkit-scrollbar { height: 6px; }
+#hand::-webkit-scrollbar-thumb { background: #2f4055; border-radius: 9px; }
+
+.card {
+  position: relative; flex: 0 0 auto; width: 104px; height: 126px; border-radius: 12px;
+  cursor: pointer; border: 1px solid #3b4c63;
+  background: linear-gradient(170deg, #26344a, #18202c);
+  padding: 24px 8px 8px; text-align: center; overflow: hidden;
+  font: inherit; color: #e9f0f8;
+  transition: transform .13s, box-shadow .13s, border-color .13s, opacity .15s;
+}
+.card::before {
+  content: ""; position: absolute; inset: 0; border-radius: 11px; opacity: .9;
+  background: linear-gradient(180deg, var(--c1), transparent 58%);
+}
+.card.bird { --c1: rgba(255,124,60,.34); }
+.card.tactic { --c1: rgba(86,158,255,.34); }
+.card:hover { transform: translateY(-9px); box-shadow: 0 14px 26px rgba(0,0,0,.5); border-color: #6d8bb0; }
+.card.dis { opacity: .38; filter: grayscale(.75); cursor: not-allowed; transform: none !important; }
+.card .ico { font-size: 26px; line-height: 1; position: relative; filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
+.card .nm { position: relative; font-size: 12.5px; font-weight: 700; margin-top: 5px; }
+.card .ds { position: relative; font-size: 10px; line-height: 1.32; color: #a9bccf; margin-top: 4px; }
+.card .cost {
+  position: absolute; top: 5px; left: 5px; z-index: 2;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #241a02;
+  background: linear-gradient(180deg, #ffe27a, #f0a92b);
+  box-shadow: 0 2px 6px rgba(0,0,0,.45);
+}
+
+.right {
+  display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  align-items: stretch; flex: 0 0 auto; min-width: 132px;
+}
+#bEnd {
+  font: inherit; font-weight: 800; font-size: 13.5px; padding: 11px 12px; border-radius: 11px;
+  cursor: pointer; border: 1px solid #3b7a45; color: #eaffe9;
+  background: linear-gradient(180deg, #38a04a, #26743a); transition: .15s;
+}
+#bEnd:hover:not(:disabled) { background: linear-gradient(180deg, #43b757, #2c8342); }
+#bEnd:disabled {
+  opacity: .42; cursor: not-allowed;
+  background: #2a3644; border-color: #3a4a5c; color: #8ea2b7;
+}
+#deckInfo { font-size: 10.5px; color: #8ba0b8; text-align: center; }
+
+/* ---------------- 遮罩 / 面板 ---------------- */
+#ov {
+  position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+  background: rgba(6,10,16,.76); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  border-radius: 14px; z-index: 9; padding: 18px;
+}
+#ov.on { display: flex; }
+.panel {
+  width: min(560px, 94%); max-height: 100%; overflow: auto;
+  border-radius: 18px; padding: 24px 26px; text-align: center;
+  background: linear-gradient(180deg, #1d2938, #131a24);
+  border: 1px solid #33455c; box-shadow: 0 24px 60px rgba(0,0,0,.6);
+}
+.panel h1 {
+  margin: 2px 0 8px; font-size: 26px;
+  background: linear-gradient(90deg, #ffd865, #ff8a4d);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.panel h2 { margin: 0 0 12px; font-size: 20px; color: #ffd865; }
+.panel p { color: #a9bccf; font-size: 13.5px; line-height: 1.75; margin: 8px 0; }
+.stars { font-size: 42px; letter-spacing: 8px; margin: 4px 0 2px; color: #ffd865;
+  text-shadow: 0 0 22px rgba(255,190,60,.6); }
+.big {
+  font: inherit; font-weight: 800; font-size: 15px; padding: 12px 26px; margin: 8px 5px 0;
+  border-radius: 12px; cursor: pointer; border: 1px solid #3b7a45; color: #eaffe9;
+  background: linear-gradient(180deg, #38a04a, #26743a); transition: .15s;
+}
+.big.alt { border-color: #3d5a80; color: #dcebff; background: linear-gradient(180deg, #37557d, #25395a); }
+.big:hover { filter: brightness(1.14); }
+.rules { text-align: left; }
+.rules b { color: #ffd865; }
+.kt {
+  display: inline-block; padding: 1px 7px; border-radius: 6px;
+  background: #26374d; color: #bcd2ea; font-size: 12px;
+}
+.lv { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.lvc {
+  width: 152px; padding: 14px 10px; border-radius: 14px; cursor: pointer;
+  border: 1px solid #3b4c63; background: linear-gradient(170deg, #26344a, #18202c);
+  font: inherit; color: #e9f0f8; transition: .15s;
+}
+.lvc:hover { transform: translateY(-4px); border-color: #6d8bb0; }
+.lvc .n { font-size: 13.5px; font-weight: 700; }
+.lvc .d { font-size: 11px; color: #93a8bf; margin-top: 4px; }
+
+/* 小屏适配 */
+@media (max-height: 760px) {
+  .card { width: 94px; height: 114px; padding-top: 22px; }
+  .card .ds { display: none; }
+}
+@media (max-width: 760px) {
+  .logo { display: none; }
+  .card { width: 88px; height: 108px; }
+  .card .ds { display: none; }
+  .right { min-width: 104px; }
+}

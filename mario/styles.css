@@ -66,6 +66,19 @@ button {
 button:hover { background: #2c3460; }
 button:active { transform: translateY(1px); }
 
+.toplink {
+  display: inline-block;
+  background: #232a4d;
+  color: var(--ink);
+  border: 1px solid #39406e;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.toplink:hover { background: #2c3460; }
+
 #frame {
   position: relative;
   border-radius: 14px;
