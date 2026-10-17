@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>恶魔轮盘 · Demon Roulette</title>
+<meta name="description" content="经典俄罗斯转盘赌枪：轮流扣扳机，空包打自己保留回合，可加弹卸弹，限次重摇轮盘。">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0;height:100%;color:#f2e9e0;font-family:"Segoe UI",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%,#3a1016 0%,#1b0a0e 45%,#0b0507 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100dvh;padding:10px;gap:8px;overflow:hidden;user-select:none;
+  }
+  #app{width:min(100%,1180px,calc((100dvh - 300px) * 1.75));display:flex;flex-direction:column;gap:8px}
+
+  /* ---------- 顶栏 ---------- */
+  #top{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:14px;flex-wrap:wrap;
+    background:linear-gradient(180deg,rgba(46,20,26,.94),rgba(22,10,14,.94));
+    border:1px solid rgba(255,120,120,.14);box-shadow:0 12px 30px rgba(0,0,0,.5)}
+  .logo{font-weight:800;font-size:15px;letter-spacing:.06em;color:#ffd9a0;display:flex;align-items:baseline;gap:8px}
+  .logo span{font-size:10px;letter-spacing:.24em;color:#b98cff}
+  .pills{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+  .pill{font-size:12px;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);color:#e8dcd4;white-space:nowrap}
+  .pill.live{color:#ff8f8f;border-color:rgba(255,90,90,.4);background:rgba(255,60,60,.12)}
+  .pill.blank{color:#9fb6d0;border-color:rgba(140,180,220,.32);background:rgba(120,170,220,.1)}
+  .btns{display:flex;gap:6px}
+  .mini{font:inherit;font-size:12px;padding:5px 12px;border-radius:8px;cursor:pointer;
+    background:#3a2028;border:1px solid #5b3540;color:#f2dede;transition:.15s;text-decoration:none;display:inline-block}
+  .mini:hover{background:#4a2832;border-color:#7a4553}
+
+  /* ---------- 舞台 ---------- */
+  #stage{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(255,120,120,.16);
+    box-shadow:0 26px 60px rgba(0,0,0,.6);background:#0d0609}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:1280/520}
+
+  .hp{position:absolute;top:12px;min-width:196px;padding:10px 12px;border-radius:14px;
+    background:rgba(18,8,12,.72);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(4px);
+    transition:.2s;line-height:1.5}
+  .hp.p1{left:12px}
+  .hp.p2{right:12px;text-align:right}
+  .hp.active{border-color:#ffd166;box-shadow:0 0 0 1px rgba(255,209,102,.5),0 0 26px rgba(255,209,102,.25)}
+  .hp.dead{opacity:.45;filter:grayscale(.7)}
+  .hp .pname{font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px}
+  .hp.p2 .pname{justify-content:flex-end}
+  .hp .tag{font-size:10px;padding:1px 6px;border-radius:999px;background:rgba(185,140,255,.18);
+    border:1px solid rgba(185,140,255,.4);color:#d8bcff}
+  .hearts{font-size:19px;letter-spacing:2px;margin-top:2px}
+  .hearts .on{color:#ff5a5f;text-shadow:0 0 10px rgba(255,90,95,.7)}
+  .hearts .off{color:#3d2a2e}
+  .hp .sub{font-size:11px;color:#c9b6b0;margin-top:2px}
+  .hp.hit{animation:hit .5s ease}
+  @keyframes hit{0%{transform:translateX(0)}25%{transform:translateX(-8px);background:rgba(120,10,10,.85)}
+    50%{transform:translateX(7px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+
+  /* ---------- 操作区 ---------- */
+  #dock{display:flex;flex-direction:column;gap:8px}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .acts button{font:inherit;cursor:pointer;border-radius:12px;padding:9px 14px;display:flex;align-items:center;gap:8px;
+    background:linear-gradient(180deg,#3d2129,#26131a);border:1px solid #5f3742;color:#f4e7e2;transition:.15s}
+  .acts button b{font-size:13px;font-weight:700}
+  .acts button i{font-style:normal;font-size:11px;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.1);color:#c9b6b0}
+  .acts button:hover:not(:disabled){transform:translateY(-2px);border-color:#a4566a;background:linear-gradient(180deg,#4d2933,#301820)}
+  .acts button:disabled{opacity:.38;cursor:not-allowed}
+  .acts button.self{border-color:#4b6f8a}
+  .acts button.foe{border-color:#8a4b4b}
+  .acts button.roll i{background:rgba(185,140,255,.2);color:#d8bcff}
+  .log{font-size:12px;line-height:1.75;color:#cbb9b4;background:rgba(20,10,14,.6);border:1px solid rgba(255,255,255,.08);
+    border-radius:12px;padding:8px 12px;height:74px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+  .log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .log .hl{color:#ffd166}
+  .log .bad{color:#ff8f8f}
+  .log .good{color:#8ff0b5}
+
+  /* ---------- 覆盖层 ---------- */
+  #ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:rgba(8,4,6,.86);backdrop-filter:blur(8px);z-index:50;overflow:auto}
+  #ov.hide{display:none}
+  .card{width:min(560px,92%);background:linear-gradient(180deg,rgba(48,22,28,.98),rgba(22,10,14,.98));
+    border:1px solid rgba(255,140,140,.22);border-radius:18px;padding:22px;text-align:center;
+    box-shadow:0 24px 60px rgba(0,0,0,.6)}
+  .card h1{margin:0 0 4px;font-size:26px;letter-spacing:.06em;color:#ffd9a0}
+  .card .sub{font-size:12px;letter-spacing:.2em;color:#b98cff;margin-bottom:14px}
+  .card p{margin:0 0 14px;font-size:13px;line-height:1.9;color:#d8c8c2;text-align:left}
+  .card .rules{text-align:left;font-size:12.5px;line-height:1.9;color:#cbb9b4;margin:0 0 16px;padding-left:18px}
+  .card .rules b{color:#ffd9a0}
+  .modes{display:flex;gap:10px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+  .btn{font:inherit;cursor:pointer;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:700;
+    background:linear-gradient(180deg,#8c2f3c,#5e1c26);border:1px solid #b4566a;color:#fff;transition:.15s}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+  .btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);font-weight:600}
+  .tip{font-size:11.5px;color:#a89a96;margin-top:10px;line-height:1.9}
+
+  @media (max-width:760px){
+    #app{width:100%;calc:auto}
+    .hp{min-width:0;padding:7px 9px;top:8px}
+    .hp .pname{font-size:12px}
+    .hp .sub{font-size:10px}
+    .hearts{font-size:15px}
+    .acts button{padding:8px 10px}
+    .acts button b{font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <div class="logo">🎲 恶魔轮盘 <span>DEMON ROULETTE</span></div>
+    <div class="pills">
+      <span class="pill" id="pRound">第 1 轮</span>
+      <span class="pill live" id="pLive">💥 实弹 0</span>
+      <span class="pill blank" id="pBlank">○ 空包 0</span>
+    </div>
+    <div class="btns">
+      <a class="mini" href="../index.html" title="返回游戏合集">🏠 合集</a>
+      <button class="mini" id="bHelp" type="button">玩法</button>
+      <button class="mini" id="bRestart" type="button">重开</button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <canvas id="game" width="1280" height="520"></canvas>
+    <div class="hp p1" id="pan0">
+      <div class="pname"><span id="n0">玩家 1</span></div>
+      <div class="hearts" id="h0"></div>
+      <div class="sub" id="s0">等待开始</div>
+    </div>
+    <div class="hp p2" id="pan1">
+      <div class="pname"><span class="tag">恶魔</span><span id="n1">恶魔</span></div>
+      <div class="hearts" id="h1"></div>
+      <div class="sub" id="s1">等待开始</div>
+    </div>
+    <div id="ov"></div>
+  </main>
+
+  <footer id="dock">
+    <div class="acts">
+      <button class="self" id="aSelf" type="button"><b>对自己开枪</b><i>1</i></button>
+      <button class="foe" id="aFoe" type="button"><b>对对手开枪</b><i>2</i></button>
+      <button id="aAdd" type="button"><b>加一颗子弹</b><i>Q</i></button>
+      <button id="aRem" type="button"><b>卸一颗子弹</b><i>E</i></button>
+      <button class="roll" id="aRoll" type="button"><b>重摇轮盘</b><i>W</i></button>
+    </div>
+    <div class="log" id="log"></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================ 音效 ============================ */
+const SFX = {
+  ctx:null, master:null,
+  init(){
+    if(this.ctx){ if(this.ctx.state==='suspended') this.ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    try{ this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = .3; this.master.connect(this.ctx.destination); }
+    catch(e){ this.ctx = null; }
+  },
+  tone(freq, dur, type='square', vol=.3, to=null, delay=0){
+    if(!this.ctx) return;
+    const t0 = this.ctx.currentTime + delay;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    if(to!==null) o.frequency.exponentialRampToValueAtTime(Math.max(20,to), t0+dur);
+    g.gain.setValueAtTime(.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0+.01);
+    g.gain.exponentialRampToValueAtTime(.0001, t0+dur);
+    o.connect(g); g.connect(this.master); o.start(t0); o.stop(t0+dur+.03);
+  },
+  noise(dur=.2, vol=.4, lp=1600, delay=0){
+    if(!this.ctx) return;
+    const t0 = this.ctx.currentTime + delay;
+    const len = Math.max(1, Math.floor(this.ctx.sampleRate*dur));
+    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+    const src = this.ctx.createBufferSource(); src.buffer = buf;
+    const f = this.ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value = lp;
+    const g = this.ctx.createGain(); g.gain.value = vol;
+    src.connect(f); f.connect(g); g.connect(this.master); src.start(t0);
+  },
+  play(name){
+    if(!this.ctx) return;
+    switch(name){
+      case 'cock':  this.tone(140, .09, 'square', .28, 60); break;
+      case 'spin':  for(let i=0;i<7;i++) this.tone(320+i*40, .04, 'square', .12, null, i*.05); break;
+      case 'bang':
+        this.noise(.34, .55, 900); this.tone(70, .3, 'sawtooth', .5, 32); this.tone(180, .12, 'square', .3, 60); break;
+      case 'click': this.noise(.09, .3, 2600); this.tone(180, .06, 'square', .22, 90); break;
+      case 'load':  this.tone(420, .07, 'square', .24); this.tone(620, .09, 'square', .2, null, .06); break;
+      case 'unload':this.tone(300, .12, 'triangle', .26, 140); break;
+      case 'hurt':  this.tone(220, .34, 'sawtooth', .38, 70); break;
+      case 'win':   [523,659,784,1047].forEach((f,i)=>this.tone(f,.2,'square',.32,null,i*.13)); break;
+      case 'lose':  [392,311,247,175].forEach((f,i)=>this.tone(f,.3,'triangle',.36,null,i*.18)); break;
+      default: break;
+    }
+  },
+};
+
+/* ============================ 状态 ============================ */
+const CHAMBERS = 6;
+const MAX_HP = 3;
+const REROLL_PER_GAME = 2;
+const SLOT_R = 34;
+const WHEEL_R = 152;
+const CW = 1280, CH = 520;
+
+const S = {
+  phase:'menu', mode:'ai', paused:false, over:false,
+  round:0, turn:0, players:[],
+  slots:[], pointer:0, modUsed:false,
+  angle:0, startAngle:0, targetAngle:0, spinT:0, spinDur:.55, spinResolve:null,
+  flash:0, shake:0,
+  centerText:{ text:'', sub:'', color:'#fff', t:0 },
+  winner:-1, log:[],
+};
+
+const $ = (s)=>document.querySelector(s);
+const clamp = (v,a,b)=>v<a?a:(v>b?b:v);
+const rnd = (a,b)=>a+Math.random()*(b-a);
+const wait = (ms)=>new Promise(r=>setTimeout(r,ms));
+const shuffle = (arr)=>{ for(let i=arr.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; };
+
+let particles = [];
+let helpFromMenu = false;
+let aiRunning = false;
+
+function makePlayers(){
+  return [
+    { i:0, name: S.mode==='ai' ? '你' : '玩家 1', ai:false, hp:MAX_HP, reroll:REROLL_PER_GAME, items:0 },
+    { i:1, name: S.mode==='ai' ? '恶魔' : '玩家 2', ai:S.mode==='ai', hp:MAX_HP, reroll:REROLL_PER_GAME, items:0 },
+  ];
+}
+const foeOf = (p)=>S.players[1-p.i];
+const liveLeft = ()=>S.slots.filter(s=>!s.spent && s.v==='live').length;
+const blankLeft = ()=>S.slots.filter(s=>!s.spent && s.v==='blank').length;
+const remainLeft = ()=>S.slots.filter(s=>!s.spent).length;
+const allSpent = ()=>remainLeft()===0;
+
+/* ============================ 日志 ============================ */
+function addLog(text, cls){
+  S.log.push({ text, cls:cls||'' });
+  if(S.log.length>50) S.log.shift();
+  $('#log').innerHTML = S.log.slice(-4).map(l=>`<div class="${l.cls}">${l.text}</div>`).join('');
+}
+
+/* ============================ 开局 / 装填 ============================ */
+function newGame(mode){
+  S.mode = mode || S.mode;
+  S.phase = 'play';
+  S.paused = false;
+  S.over = false;
+  S.round = 0;
+  S.turn = 0;
+  S.winner = -1;
+  S.modUsed = false;
+  S.players = makePlayers();
+  S.log = [];
+  particles = [];
+  S.angle = 0; S.startAngle = 0; S.targetAngle = 0;
+  S.spinResolve = null;
+  S.centerText = { text:'', sub:'', color:'#fff', t:0 };
+  S.flash = 0; S.shake = 0;
+  addLog(S.mode==='ai' ? '你 vs 恶魔 —— 你先手。' : '双人同屏 —— 玩家 1 先手。', 'hl');
+  loadRound(true);
+  syncUI();
+  if(S.players[S.turn].ai) aiLoop();
+}
+
+function loadRound(first){
+  S.round += 1;
+  const live = Math.min(4, 1 + Math.ceil(S.round/1.4));
+  S.slots = [];
+  for(let i=0;i<CHAMBERS;i++) S.slots.push({ v: i<live ? 'live' : 'blank', spent:false, peek:false });
+  shuffle(S.slots);
+  S.pointer = 0;
+  S.modUsed = false;
+  const msg = `第 ${S.round} 轮装填：${live} 发实弹 / ${CHAMBERS-live} 发空包，顺序未知。`;
+  addLog((first?'':'—— ')+msg+(first?'':' ——'), 'hl');
+  spinTo(0, 1, .6);
+}
+
+/* ============================ 轮盘动画 ============================ */
+function spinTo(slotIndex, extraTurns, dur){
+  if(S.spinResolve){ const old = S.spinResolve; S.spinResolve = null; old(); }
+  return new Promise((resolve)=>{
+    const base = -(slotIndex * Math.PI*2 / CHAMBERS);
+    let target = base - Math.PI*2*(extraTurns||0);
+    while(target >= S.angle - 1e-6) target -= Math.PI*2;
+    S.startAngle = S.angle;
+    S.targetAngle = target;
+    S.spinT = 0;
+    S.spinDur = dur || .55;
+    S.spinResolve = resolve;
+  });
+}
+
+/* ============================ 行动 ============================ */
+// canPlay：内部行动校验（人类和 AI 都允许）；canAct：仅人类可操作（用于 UI）
+function canPlay(){ return S.phase==='play' && !S.paused && !S.over; }
+function canAct(){ return canPlay() && !S.players[S.turn].ai; }
+
+function nextPointer(){
+  for(let k=1;k<=CHAMBERS;k++){
+    const idx = (S.pointer + k) % CHAMBERS;
+    if(!S.slots[idx].spent) return idx;
+  }
+  return S.pointer;
+}
+
+function useAdd(){
+  if(!canPlay() || S.modUsed) return false;
+  const blanks = S.slots.filter(s=>!s.spent && s.v==='blank');
+  if(blanks.length===0){ addLog('没有空包可以改装了。'); return false; }
+  const slot = blanks[(Math.random()*blanks.length)|0];
+  slot.v = 'live';
+  S.modUsed = true;
+  SFX.play('load');
+  addLog(`${S.players[S.turn].name} 往弹巢里塞了一发实弹（剩余 ${remainLeft()} 格）`, 'bad');
+  syncUI();
+  return true;
+}
+
+function useRemove(){
+  if(!canPlay() || S.modUsed) return false;
+  const lives = S.slots.filter(s=>!s.spent && s.v==='live');
+  if(lives.length===0){ addLog('弹巢里已经没有实弹了。'); return false; }
+  const slot = lives[(Math.random()*lives.length)|0];
+  slot.v = 'blank';
+  S.modUsed = true;
+  SFX.play('unload');
+  addLog(`${S.players[S.turn].name} 卸掉了一发实弹（剩余 ${remainLeft()} 格）`, 'good');
+  syncUI();
+  return true;
+}
+
+function useReroll(){
+  if(!canPlay()) return false;
+  const p = S.players[S.turn];
+  if(p.reroll<=0){ addLog(`${p.name} 没有重摇次数了。`); return false; }
+  if(remainLeft()<=1){ addLog('只剩最后一格，重摇没有意义。'); return false; }
+  p.reroll -= 1;
+  const rest = S.slots.filter(s=>!s.spent);
+  const vals = shuffle(rest.map(s=>s.v));
+  rest.forEach((s,i)=>{ s.v = vals[i]; });
+  S.slots[S.pointer].peek = true;
+  SFX.play('spin');
+  shake(6);
+  const peek = S.slots[S.pointer].v==='live' ? '💥 实弹' : '○ 空包';
+  addLog(`${p.name} 重摇轮盘 —— 枪口这一格是 ${peek}（剩余重摇 ${p.reroll}）`, 'hl');
+  spinTo(S.pointer, 1, .7);
+  syncUI();
+  return true;
+}
+
+async function doShoot(target){
+  if(!canPlay()) return;
+  const me = S.players[S.turn];
+  const victim = target==='self' ? me : foeOf(me);
+  S.phase = 'anim';
+  syncUI();
+
+  SFX.play('cock');
+  await spinTo(S.pointer, 1, .6);
+
+  const slot = S.slots[S.pointer];
+  const isLive = slot.v==='live';
+  slot.spent = true;
+  slot.peek = false;
+
+  await fire(isLive);
+
+  if(isLive){
+    victim.hp -= 1;
+    SFX.play('bang'); SFX.play('hurt');
+    hitCard(victim);
+    shake(16);
+    addLog(`${me.name} 朝${target==='self'?'自己':'对手'}扣下扳机 —— 💥 <b>实弹</b>！${victim.name} -1 ♥`, 'bad');
+    await wait(950);
+    if(victim.hp<=0){ endGame(1-victim.i); return; }
+    await afterShot();
+  } else {
+    SFX.play('click');
+    if(target==='self'){
+      addLog(`${me.name} 朝自己扣下扳机 —— 咔哒，<b>空包</b>，保留回合`, 'good');
+      await wait(700);
+      await advancePointer();
+      S.modUsed = false;
+      S.phase = 'play';
+      syncUI();
+      if(S.players[S.turn].ai) aiLoop();
+      return;
+    }
+    addLog(`${me.name} 朝对手扣下扳机 —— 咔哒，<b>空包</b>，回合交给对手`, 'good');
+    await wait(700);
+    await afterShot();
+  }
+}
+
+async function afterShot(){
+  await advancePointer();
+  S.turn = 1 - S.turn;
+  S.modUsed = false;
+  S.phase = 'play';
+  syncUI();
+  if(S.players[S.turn].ai) aiLoop();
+}
+
+async function advancePointer(){
+  if(allSpent()){ await reloadIfEmpty(); return; }
+  S.pointer = nextPointer();
+  S.slots[S.pointer].peek = false;
+  await spinTo(S.pointer, 0, .35);
+}
+
+async function reloadIfEmpty(){
+  if(!allSpent()) return;
+  await wait(450);
+  loadRound(false);
+  await wait(650);
+}
+
+function endGame(winner){
+  S.phase = 'over';
+  S.over = true;
+  S.winner = winner;
+  const w = S.players[winner];
+  SFX.play(S.mode==='ai' && winner===1 ? 'lose' : 'win');
+  addLog(`${w.name} 赢下了这一局。`, 'hl');
+  showOverlay(overlayEnd());
+  syncUI();
+}
+
+/* ============================ AI ============================ */
+async function aiLoop(){
+  if(aiRunning) return;
+  aiRunning = true;
+  try{
+    let guard = 0;
+    while(!S.over && !S.paused && S.phase==='play' && S.players[S.turn] && S.players[S.turn].ai && guard++ < 40){
+      await wait(rnd(520, 900));
+      if(S.phase!=='play' || S.paused || S.over) return;
+      await aiStep();
+    }
+  } finally {
+    aiRunning = false;
+  }
+}
+
+async function aiStep(){
+  if(S.paused || S.phase!=='play') return;
+  const me = S.players[1], you = S.players[0];
+  const remain = remainLeft(), live = liveLeft();
+  const p = remain ? live/remain : 0;
+  const nextVal = S.slots[S.pointer].v;
+  const known = S.slots[S.pointer].peek;
+
+  if(known){
+    if(nextVal==='blank'){
+      if(!S.modUsed && blankLeft()>=2 && Math.random()<.5){ useAdd(); return; }
+      await doShoot('self'); return;
+    }
+    if(!S.modUsed && blankLeft()>=1 && Math.random()<.6){ useAdd(); return; }
+    await doShoot('foe'); return;
+  }
+
+  if(me.hp===1 && p>=.4){
+    if(!S.modUsed && liveLeft()>0){ useRemove(); return; }
+    if(me.reroll>0 && Math.random()<.6){ useReroll(); return; }
+  }
+  if(you.hp===1 && !S.modUsed && blankLeft()>=1 && p>=.3){ useAdd(); return; }
+  if(p<=.34){ await doShoot('self'); return; }
+  if(p>=.55){
+    if(!S.modUsed && blankLeft()>=2 && Math.random()<.35){ useAdd(); return; }
+    await doShoot('foe'); return;
+  }
+  if(Math.random()<.5) await doShoot('self'); else await doShoot('foe');
+}
+
+/* ============================ 特效 ============================ */
+function shake(v){ S.shake = Math.min(26, S.shake+v); }
+
+function burst(x, y, n, color, lift, speed){
+  for(let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2;
+    const sp = rnd(speed*.4, speed);
+    particles.push({ x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 60*(lift||0),
+      life:rnd(.4,.9), max:.9, color, size:rnd(2,5), gravity:900 });
+  }
+}
+
+async function fire(isLive){
+  const mx = CW/2, my = CH/2 - WHEEL_R;
+  if(isLive){
+    S.flash = 1; S.shake = 20;
+    burst(mx, my, 26, '#ffd166', .6, 420);
+    burst(mx, my, 14, '#ff6b3d', .8, 300);
+    S.centerText = { text:'实弹！', sub:'', color:'#ff8f6b', t:1.1 };
+  } else {
+    S.shake = 5;
+    burst(mx, my, 8, 'rgba(220,220,220,.75)', -.3, 120);
+    S.centerText = { text:'空包', sub:'咔哒', color:'#9fb6d0', t:.9 };
+  }
+  await wait(isLive ? 620 : 420);
+}
+
+function hitCard(p){
+  const el = p.i===0 ? $('#pan0') : $('#pan1');
+  el.classList.add('hit');
+  setTimeout(()=>el.classList.remove('hit'), 520);
+}
+
+/* ============================ UI ============================ */
+function syncUI(){
+  const me = S.players[S.turn] || S.players[0];
+  $('#pRound').textContent = `第 ${Math.max(1,S.round)} 轮`;
+  $('#pLive').textContent = `💥 实弹 ${liveLeft()}`;
+  $('#pBlank').textContent = `○ 空包 ${blankLeft()}`;
+
+  S.players.forEach((p,i)=>{
+    $('#n'+i).textContent = p.name;
+    $('#h'+i).innerHTML = Array.from({length:MAX_HP})
+      .map((_,k)=>`<span class="${k<p.hp?'on':'off'}">♥</span>`).join('');
+    const pan = i===0 ? $('#pan0') : $('#pan1');
+    const isTurn = S.phase==='play' && !S.paused && S.turn===i;
+    pan.classList.toggle('active', isTurn);
+    pan.classList.toggle('dead', p.hp<=0);
+    const s = [];
+    if(p.hp<=0) s.push('已倒下');
+    else if(isTurn) s.push('正在行动');
+    else s.push('等待中');
+    s.push(`重摇 ×${p.reroll}`);
+    if(isTurn && S.modUsed) s.push('改装已用');
+    $('#s'+i).textContent = s.join(' · ');
+  });
+
+  const act = canAct();
+  const setBtn = (sel,on)=>{ $(sel).disabled = !on; };
+  setBtn('#aSelf', act);
+  setBtn('#aFoe', act);
+  setBtn('#aAdd', act && !S.modUsed && blankLeft()>0);
+  setBtn('#aRem', act && !S.modUsed && liveLeft()>0);
+  setBtn('#aRoll', act && me.reroll>0 && remainLeft()>1);
+  $('#aRoll').querySelector('i').textContent = act ? 'W×'+me.reroll : 'W';
+  $('#aSelf').querySelector('i').textContent = act ? '1' : '…';
+}
+
+/* ============================ 覆盖层 ============================ */
+function showOverlay(html){
+  const ov = $('#ov');
+  ov.innerHTML = html;
+  ov.classList.remove('hide');
+  bindOverlay();
+}
+function hideOverlay(){ const ov=$('#ov'); ov.classList.add('hide'); ov.innerHTML=''; }
+
+function overlayMenu(){
+  return `<div class="card">
+    <h1>🎲 恶魔轮盘</h1>
+    <div class="sub">D E M O N &nbsp; R O U L E T T E</div>
+    <p>经典俄罗斯转盘赌枪：弹巢里混装着实弹与空包，你和对手轮流扣扳机。
+       朝自己开枪撞上空包时，<b>回合继续归你</b>——这是本局最刺激的赌注。</p>
+    <ul class="rules">
+      <li><b>对自己开枪</b>：空包 → 保留回合继续行动；实弹 → 自己掉 1 血</li>
+      <li><b>对对手开枪</b>：实弹 → 对手掉 1 血；空包 → 白白交出回合</li>
+      <li><b>加 / 卸子弹</b>：每回合二选一，当场改变弹巢构成</li>
+      <li><b>重摇轮盘</b>（每人每局限 ${REROLL_PER_GAME} 次）：重新洗牌，并公开枪口那一格</li>
+      <li>打光 6 格自动重新装填，轮次越靠后实弹越多</li>
+    </ul>
+    <div class="modes">
+      <button class="btn" data-mode="ai">对战恶魔</button>
+      <button class="btn ghost" data-mode="duo">双人同屏</button>
+    </div>
+    <div class="tip">快捷键：<b>1</b> 打自己 · <b>2</b> 打对手 · <b>Q</b> 加弹 · <b>E</b> 卸弹 · <b>W</b> 重摇 · <b>R</b> 重开</div>
+  </div>`;
+}
+
+function overlayHelp(fromMenu){
+  return `<div class="card">
+    <h1>玩法说明</h1>
+    <div class="sub">R U L E S</div>
+    <ul class="rules">
+      <li>弹巢共 6 格，装填时只公开<b>实弹 / 空包的数量</b>，顺序未知</li>
+      <li>双方轮流扣扳机，指针顺时针推进到下一格</li>
+      <li><b>对自己开枪出空包 → 保留回合</b>，可以继续改装、继续开枪</li>
+      <li>每回合可以<b>加一颗实弹</b>或<b>卸一颗实弹</b>（二选一）</li>
+      <li><b>重摇轮盘</b>会重新洗牌，枪口那格可能反而变成实弹——想清楚再赌</li>
+      <li>先把对手血量打到 0 的一方获胜</li>
+    </ul>
+    <button class="btn" data-act="${fromMenu?'back':'close'}">${fromMenu?'返回':'继续游戏'}</button>
+  </div>`;
+}
+
+function overlayEnd(){
+  const w = S.players[S.winner] || S.players[0];
+  const title = S.mode==='ai' ? (S.winner===0 ? '你赢了恶魔' : '恶魔赢下了这一局') : `${w.name} 获胜`;
+  return `<div class="card">
+    <h1>${S.mode==='ai' && S.winner===1 ? '💀 ' : '🏆 '}${title}</h1>
+    <div class="sub">第 ${S.round} 轮结束</div>
+    <p>再试一局，换一种赌法：是早点加弹压迫对手，还是留着卸弹保命，
+       全看你怎么读这一轮的概率。</p>
+    <div class="modes">
+      <button class="btn" data-mode="${S.mode}">再来一局</button>
+      <button class="btn ghost" data-act="menu">换个模式</button>
+    </div>
+  </div>`;
+}
+
+function bindOverlay(){
+  $('#ov').querySelectorAll('[data-mode]').forEach(b=>{
+    b.addEventListener('click', ()=>{ SFX.init(); hideOverlay(); newGame(b.getAttribute('data-mode')); });
+  });
+  $('#ov').querySelectorAll('[data-act]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const a = b.getAttribute('data-act');
+      if(a==='close'){
+        hideOverlay();
+        S.paused = false;
+        syncUI();
+        if(S.phase==='play' && S.players[S.turn].ai) aiLoop();
+      } else if(a==='back'){
+        showOverlay(overlayMenu());
+      } else if(a==='menu'){
+        S.phase='menu'; S.over=false; S.paused=false;
+        showOverlay(overlayMenu());
+        syncUI();
+      }
+    });
+  });
+}
+
+/* ============================ 绘制 ============================ */
+const cv = $('#game');
+const ctx = cv.getContext('2d');
+let dpr = 1;
+
+function resize(){
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(CW*dpr);
+  cv.height = Math.round(CH*dpr);
+  ctx.imageSmoothingEnabled = false;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function draw(ts){
+  const now = ts/1000;
+  const dt = Math.min(.05, now - (draw.last || now));
+  draw.last = now;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,CW,CH);
+
+  S.shake = Math.max(0, S.shake - dt*70);
+  const shx = rnd(-1,1)*S.shake*.5, shy = rnd(-1,1)*S.shake*.5;
+  ctx.save();
+  ctx.translate(shx, shy);
+
+  drawTable();
+
+  if(S.spinResolve){
+    S.spinT += dt;
+    const k = Math.min(1, S.spinT/(S.spinDur||.55));
+    const e = 1 - Math.pow(1-k,3);
+    S.angle = S.startAngle + (S.targetAngle - S.startAngle)*e;
+    if(k>=1){
+      S.angle = S.targetAngle;
+      const r = S.spinResolve; S.spinResolve = null;
+      if(r) r();
+    }
+  }
+
+  drawWheel();
+  drawParticles(dt);
+  drawCenterText(dt);
+  drawTurnLabel();
+  ctx.restore();
+
+  requestAnimationFrame(draw);
+}
+
+function drawTable(){
+  const g = ctx.createRadialGradient(CW/2, CH/2, 40, CW/2, CH/2, 620);
+  g.addColorStop(0, '#2a1219');
+  g.addColorStop(.55, '#180a0f');
+  g.addColorStop(1, '#0b0508');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,CW,CH);
+
+  ctx.save();
+  ctx.translate(CW/2, CH/2+30);
+  ctx.beginPath();
+  ctx.ellipse(0,0,560,210,0,0,Math.PI*2);
+  const tg = ctx.createLinearGradient(0,-180,0,240);
+  tg.addColorStop(0,'rgba(255,120,120,.06)');
+  tg.addColorStop(1,'rgba(0,0,0,.35)');
+  ctx.fillStyle = tg; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,160,160,.10)'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.restore();
+}
+
+function drawWheel(){
+  const cx = CW/2, cy = CH/2;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  const ring = ctx.createLinearGradient(0,-200,0,200);
+  ring.addColorStop(0,'#5c4a3a'); ring.addColorStop(.5,'#2c231c'); ring.addColorStop(1,'#4a3a2c');
+  ctx.beginPath(); ctx.arc(0,0,196,0,Math.PI*2);
+  ctx.fillStyle = ring; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,209,150,.22)'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(0,0,168,0,Math.PI*2);
+  ctx.fillStyle = '#140a0d'; ctx.fill();
+  ctx.restore();
+
+  for(let i=0;i<CHAMBERS;i++){
+    const slot = S.slots[i];
+    const a = i*Math.PI*2/CHAMBERS - Math.PI/2 + S.angle;
+    drawSlot(cx + Math.cos(a)*WHEEL_R, cy + Math.sin(a)*WHEEL_R, slot, i===S.pointer && !slot.spent);
+  }
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  const pulse = .6 + .4*Math.sin(performance.now()/420);
+  for(const dx of [-22,22]){
+    const gg = ctx.createRadialGradient(dx,0,1,dx,0,22);
+    gg.addColorStop(0, `rgba(255,80,80,${.85*pulse})`);
+    gg.addColorStop(1,'rgba(255,40,40,0)');
+    ctx.fillStyle = gg;
+    ctx.beginPath(); ctx.arc(dx,0,22,0,Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = '#ff5a5a';
+  ctx.beginPath(); ctx.ellipse(-22,0,7,5,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(22,0,7,5,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,240,220,.85)';
+  ctx.font = 'bold 13px "Segoe UI",system-ui,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(remainLeft()+' / '+CHAMBERS, 0, 42);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(cx, cy - WHEEL_R - 62);
+  ctx.beginPath();
+  ctx.moveTo(0,30); ctx.lineTo(-17,-2); ctx.lineTo(17,-2);
+  ctx.closePath();
+  const pg = ctx.createLinearGradient(0,-2,0,30);
+  pg.addColorStop(0,'#ffd166'); pg.addColorStop(1,'#c8892b');
+  ctx.fillStyle = pg; ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.restore();
+}
+
+function drawSlot(x, y, slot, isCurrent){
+  ctx.save();
+  ctx.translate(x, y);
+
+  ctx.beginPath(); ctx.arc(0,0,SLOT_R+5,0,Math.PI*2);
+  ctx.fillStyle = slot.spent ? 'rgba(20,12,14,.9)' : 'rgba(58,42,34,.95)';
+  ctx.fill();
+
+  if(slot.spent){
+    ctx.beginPath(); ctx.arc(0,0,SLOT_R-4,0,Math.PI*2);
+    ctx.fillStyle = '#120a0c'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.14)';
+    ctx.font = 'bold 18px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('✕', 0, 1);
+  } else if(slot.peek){
+    const live = slot.v==='live';
+    const gg = ctx.createRadialGradient(0,0,2,0,0,SLOT_R+14);
+    gg.addColorStop(0, live?'rgba(255,90,70,.95)':'rgba(150,190,230,.85)');
+    gg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = gg;
+    ctx.beginPath(); ctx.arc(0,0,SLOT_R+14,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,0,SLOT_R-2,0,Math.PI*2);
+    ctx.fillStyle = live?'#c02a2a':'#3a4f66'; ctx.fill();
+    ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 15px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(live?'实弹':'空包', 0, 1);
+  } else {
+    const mg = ctx.createLinearGradient(-SLOT_R,-SLOT_R,SLOT_R,SLOT_R);
+    mg.addColorStop(0,'#4a4a52'); mg.addColorStop(.45,'#2a2a30'); mg.addColorStop(1,'#15151a');
+    ctx.beginPath(); ctx.arc(0,0,SLOT_R-2,0,Math.PI*2);
+    ctx.fillStyle = mg; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(-6,-6,SLOT_R*.42,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,.10)'; ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.30)';
+    ctx.font = 'bold 17px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('?', 0, 1);
+  }
+
+  if(isCurrent){
+    const pulse = .55 + .45*Math.sin(performance.now()/260);
+    ctx.beginPath(); ctx.arc(0,0,SLOT_R+9,0,Math.PI*2);
+    ctx.strokeStyle = `rgba(255,209,102,${.5+pulse*.5})`;
+    ctx.lineWidth = 4; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawParticles(dt){
+  ctx.save();
+  for(const p of particles){
+    p.life -= dt;
+    p.vy += p.gravity*dt;
+    p.x += p.vx*dt;
+    p.y += p.vy*dt;
+  }
+  particles = particles.filter(p=>p.life>0);
+  for(const p of particles){
+    ctx.globalAlpha = clamp(p.life/p.max,0,1);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x-p.size/2, p.y-p.size/2, p.size, p.size);
+  }
+  ctx.restore();
+
+  if(S.flash>0){
+    S.flash = Math.max(0, S.flash - dt*3.2);
+    ctx.save();
+    ctx.globalAlpha = S.flash*.55;
+    const g = ctx.createRadialGradient(CW/2, CH/2-WHEEL_R, 10, CW/2, CH/2-WHEEL_R, 260);
+    g.addColorStop(0,'rgba(255,240,200,1)');
+    g.addColorStop(1,'rgba(255,180,80,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,CW,CH);
+    ctx.restore();
+  }
+}
+
+function drawCenterText(dt){
+  if(S.centerText.t<=0) return;
+  S.centerText.t -= dt;
+  const a = clamp(S.centerText.t/.5,0,1);
+  ctx.save();
+  ctx.globalAlpha = a;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font = 'bold 54px "Segoe UI","Microsoft YaHei",system-ui,sans-serif';
+  ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(0,0,0,.55)';
+  ctx.strokeText(S.centerText.text, CW/2, 86);
+  ctx.fillStyle = S.centerText.color;
+  ctx.fillText(S.centerText.text, CW/2, 86);
+  ctx.restore();
+}
+
+function drawTurnLabel(){
+  if(S.phase!=='play' || S.paused) return;
+  const p = S.players[S.turn];
+  if(!p) return;
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font = 'bold 15px "Segoe UI","Microsoft YaHei",system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.62)';
+  ctx.fillText(`${p.name} 的回合${S.modUsed?' · 改装已用':''}`, CW/2, CH-26);
+  ctx.restore();
+}
+
+/* ============================ 输入 ============================ */
+$('#aSelf').addEventListener('click', ()=>doShoot('self'));
+$('#aFoe').addEventListener('click', ()=>doShoot('foe'));
+$('#aAdd').addEventListener('click', ()=>useAdd());
+$('#aRem').addEventListener('click', ()=>useRemove());
+$('#aRoll').addEventListener('click', ()=>useReroll());
+$('#bRestart').addEventListener('click', ()=>{ SFX.init(); hideOverlay(); newGame(S.mode); });
+$('#bHelp').addEventListener('click', ()=>{
+  SFX.init();
+  if(S.phase==='menu' || S.phase==='over'){ helpFromMenu = true; showOverlay(overlayHelp(true)); }
+  else {
+    helpFromMenu = false;
+    S.paused = true;
+    showOverlay(overlayHelp(false));
+    syncUI();
+  }
+});
+
+window.addEventListener('keydown', (e)=>{
+  if(e.repeat) return;
+  const k = e.key.toLowerCase();
+  if(k==='r'){ e.preventDefault(); SFX.init(); hideOverlay(); newGame(S.mode); return; }
+  if(!canAct()) return;
+  if(k==='1'){ e.preventDefault(); doShoot('self'); }
+  else if(k==='2'){ e.preventDefault(); doShoot('foe'); }
+  else if(k==='q'){ e.preventDefault(); useAdd(); }
+  else if(k==='e'){ e.preventDefault(); useRemove(); }
+  else if(k==='w'){ e.preventDefault(); useReroll(); }
+});
+window.addEventListener('pointerdown', ()=>SFX.init());
+
+/* ============================ 启动 ============================ */
+S.players = makePlayers();
+S.slots = [];
+for(let i=0;i<CHAMBERS;i++) S.slots.push({ v:'blank', spent:false, peek:false });
+showOverlay(overlayMenu());
+syncUI();
+requestAnimationFrame(draw);
+
+})();
+</script>
+</body>
+</html>
