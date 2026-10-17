@@ -290,14 +290,23 @@ function loadRound(first){
 function spinTo(slotIndex, extraTurns, dur){
   if(S.spinResolve){ const old = S.spinResolve; S.spinResolve = null; old(); }
   return new Promise((resolve)=>{
+    const d = dur || .55;
     const base = -(slotIndex * Math.PI*2 / CHAMBERS);
     let target = base - Math.PI*2*(extraTurns||0);
     while(target >= S.angle - 1e-6) target -= Math.PI*2;
     S.startAngle = S.angle;
     S.targetAngle = target;
     S.spinT = 0;
-    S.spinDur = dur || .55;
+    S.spinDur = d;
     S.spinResolve = resolve;
+    // 兜底：浏览器在后台会暂停 requestAnimationFrame，用定时器保证流程不卡死
+    setTimeout(()=>{
+      if(S.spinResolve === resolve){
+        S.angle = S.targetAngle;
+        S.spinResolve = null;
+        resolve();
+      }
+    }, d*1000 + 350);
   });
 }
 
